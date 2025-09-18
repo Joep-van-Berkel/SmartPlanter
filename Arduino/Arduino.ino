@@ -2,6 +2,10 @@
 #include <hal/hal.h>
 #include <SPI.h>
 
+#include "PHSensor.h"
+
+PHSensor phSensor(A1);
+
 // LoRaWAN NwkSKey, network session key
 // This is the default Semtech key, which is used by the early prototype TTN
 // network.
@@ -102,19 +106,31 @@ void onEvent(ev_t ev) {
 }
 
 void do_send(osjob_t* j) {
-  // Check if there is not a current TX/RX job running
-  if (LMIC.opmode & OP_TXRXPEND) {
-    Serial.println(F("OP_TXRXPEND, not sending"));
-  } else {
-    // Prepare upstream data transmission at the next possible time. (versturen)
-    LMIC_setTxData2(1, mydata, sizeof(mydata) - 1, 0);
-    Serial.println(F("Packet queued"));
-  }
-  // Next TX is scheduled after TX_COMPLETE event.
+    // sensor waarde ophalen
+    float phValue = phSensor.readPH();
+
+    // Converteer naar integer (x100 voor 2 decimalen)
+    uint16_t phInt = (uint16_t)(phValue * 100);
+
+    // Bouw payload (2 bytes)
+    uint8_t payload[2];
+    payload[0] = highByte(phInt);
+    payload[1] = lowByte(phInt);
+
+    // Check of er al een TX bezig is
+    if (LMIC.opmode & OP_TXRXPEND) {
+        Serial.println(F("OP_TXRXPEND, not sending"));
+    } else {
+        LMIC_setTxData2(1, payload, sizeof(payload), 0);
+        Serial.print(F("Packet queued, pH="));
+        Serial.println(phValue, 2);
+    }
 }
+
 
 void setup() {
   Serial.begin(115200);
+  phSensor.begin();
   Serial.println(F("Starting"));
 
 #ifdef VCC_ENABLE
@@ -191,4 +207,7 @@ void setup() {
 
 void loop() {
   os_runloop_once();
+
+  float phValue = phSensor.readPH();
+  Serial.println(phValue);
 }
