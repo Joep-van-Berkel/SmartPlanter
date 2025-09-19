@@ -4,7 +4,7 @@
 
 #include "PHSensor.h"
 
-PHSensor phSensor(A1);
+PHSensor phSensor(A0);
 
 // LoRaWAN NwkSKey, network session key
 // This is the default Semtech key, which is used by the early prototype TTN
