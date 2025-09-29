@@ -6,6 +6,9 @@
 
 PHSensor phSensor(A0);
 
+#define sensorPin A4 // Digital pin connected to the sensor's output
+volatile int pulseCount; // Volatile because it is in an interrupt context
+
 // LoRaWAN NwkSKey, network session key
 // This is the default Semtech key, which is used by the early prototype TTN
 // network.
@@ -27,10 +30,12 @@ void os_getDevEui(u1_t* buf) {}
 void os_getDevKey(u1_t* buf) {}
 
 static uint8_t mydata[] = "Hello, world!";
-static osjob_t sendjob;
+static osjob_t sendjob, scanjob;
 
 // cyclus berichten sturen in secondes
 const unsigned TX_INTERVAL = 20;
+
+const unsigned SCAN_INTERVAL = 1;
 
 // Pin mapping
 const lmic_pinmap lmic_pins = {
@@ -105,6 +110,20 @@ void onEvent(ev_t ev) {
   }
 }
 
+void do_scan(osjob_t* j) {
+  float flowRate = pulseCount / 7.5;
+  Serial.print("Flow rate: ");
+  Serial.print(flowRate);
+  Serial.println(" L/min");
+
+  pulseCount=0;
+
+  // Schedule next transmission
+  os_setTimedCallback(&scanjob, os_getTime() + sec2osticks(SCAN_INTERVAL), do_scan);
+
+}
+
+
 void do_send(osjob_t* j) {
     // sensor waarde ophalen
     float phValue = phSensor.readPH();
@@ -127,6 +146,13 @@ void do_send(osjob_t* j) {
     }
 }
 
+ISR (PCINT1_vect)
+{
+  // Interrupt for Port C
+  // Invert toggle state
+    pulseCount++;
+}
+
 
 void setup() {
   Serial.begin(115200);
@@ -140,6 +166,12 @@ void setup() {
   delay(1000);
 #endif
 
+  pinMode(sensorPin, INPUT);
+
+    // Enable PCIE1 Bit2 = 1 (Port C)
+  PCICR |= B00000010;
+  // Select PCINT12 Bit5 = 1 (Pin A4)
+  PCMSK1 |= B00010000;
   // LMIC init
   os_init();
   // Reset the MAC state. Session and pending data transfers will be discarded.
@@ -203,11 +235,10 @@ void setup() {
 
   // Start job
   do_send(&sendjob);
+  do_scan(&scanjob);
 }
 
 void loop() {
   os_runloop_once();
 
-  float phValue = phSensor.readPH();
-  Serial.println(phValue);
 }
