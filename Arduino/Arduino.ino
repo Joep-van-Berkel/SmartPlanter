@@ -3,8 +3,10 @@
 #include <SPI.h>
 
 #include "PHSensor.h"
+#include "Temperatuur.h"
 
 PHSensor phSensor(A0);
+TemperatuurSensor TemperatuurSensor(3);
 
 #define sensorPin A4 // Digital pin connected to the sensor's output
 volatile int pulseCount; // Volatile because it is in an interrupt context
@@ -115,6 +117,14 @@ void do_scan(osjob_t* j) {
   Serial.print("Flow rate: ");
   Serial.print(flowRate);
   Serial.println(" L/min");
+
+  Serial.println("-----------------");
+
+  TemperatuurSensor.begin();
+  float temperatuurSensor = TemperatuurSensor.readTemperatureC();
+  Serial.print("Temperatuur: ");
+  Serial.print(temperatuurSensor);
+  Serial.println(" °C");
 
   pulseCount=0;
 
