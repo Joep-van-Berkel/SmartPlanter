@@ -118,14 +118,6 @@ void do_scan(osjob_t* j) {
   Serial.print(flowRate);
   Serial.println(" L/min");
 
-  Serial.println("-----------------");
-
-  TemperatuurSensor.begin();
-  float temperatuurSensor = TemperatuurSensor.readTemperatureC();
-  Serial.print("Temperatuur: ");
-  Serial.print(temperatuurSensor);
-  Serial.println(" °C");
-
   pulseCount=0;
 
   // Schedule next transmission
@@ -135,16 +127,24 @@ void do_scan(osjob_t* j) {
 
 
 void do_send(osjob_t* j) {
+    TemperatuurSensor.begin();
+
     // sensor waarde ophalen
     float phValue = phSensor.readPH();
+    float temperatuurValue = TemperatuurSensor.readTemperatureC();
 
     // Converteer naar integer (x100 voor 2 decimalen)
     uint16_t phInt = (uint16_t)(phValue * 100);
+    
+    // Conventeer naar integer 
+    uint16_t  tempInt = temperatuurValue * 100;  
 
-    // Bouw payload (2 bytes)
-    uint8_t payload[2];
+    // Bouw payload (4 bytes)
+    uint8_t payload[4];
     payload[0] = highByte(phInt);
     payload[1] = lowByte(phInt);
+    payload[2] = highByte(tempInt);
+    payload[3] = lowByte(tempInt);
 
     // Check of er al een TX bezig is
     if (LMIC.opmode & OP_TXRXPEND) {
