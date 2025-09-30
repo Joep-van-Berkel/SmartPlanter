@@ -8,6 +8,7 @@ WaterFlow::WaterFlow(byte pinIn, float calibrationFactor) {
 
   pulseCountIn = 0;
   flowRateIn = 0;
+
   lastTime = 0;
 
   instance = this; // zodat de static interrupt toegang heeft

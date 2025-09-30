@@ -2,6 +2,7 @@
 #define WATERFLOW_H
 
 #include <Arduino.h>
+#include <math.h>
 
 class WaterFlow {
 public:
@@ -10,9 +11,7 @@ public:
     void begin();
     void update();
 
-    float getFlow() { return flowRate; }
-    void setMinFlow(float minValue) { minFlow = minValue; }
-    bool isBelowMinimum() { return flowRate < minFlow; }
+    int getFlow() { return (int)round(flowRateIn); }
 
     float getFlowIn()  { return flowRateIn; }
     float getDifference() { return flowRateIn; }

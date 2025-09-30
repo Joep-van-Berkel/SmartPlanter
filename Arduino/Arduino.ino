@@ -1,6 +1,7 @@
 #include <lmic.h>
 #include <hal/hal.h>
 #include <SPI.h>
+#include <math.h>
 
 #include "Waterflow.h"
 #include "PHSensor.h"
@@ -115,8 +116,9 @@ void onEvent(ev_t ev) {
 
 void do_scan(osjob_t* j) {
   float flowRate = pulseCount / 7.5;
+  int  roundFlow = (int)round(flowRate);
   Serial.print("Flow rate: ");
-  Serial.print(flowRate);
+  Serial.print(roundFlow);
   Serial.println(" L/min");
   
   pulseCount=0;
@@ -128,8 +130,6 @@ void do_scan(osjob_t* j) {
 
 
 void do_send(osjob_t* j) {
-    TemperatuurSensor.begin();
-
     // sensor waarde ophalen
     float phValue = phSensor.readPH();
     float temperatuurValue = TemperatuurSensor.readTemperatureC();
@@ -168,6 +168,8 @@ ISR (PCINT1_vect)
 void setup() {
   Serial.begin(115200);
   phSensor.begin();
+  TemperatuurSensor.begin();
+  WaterflowSensor.begin();
   Serial.println(F("Starting"));
 
 
