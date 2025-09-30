@@ -2,13 +2,14 @@
 #include <hal/hal.h>
 #include <SPI.h>
 
+#include "Waterflow.h"
 #include "PHSensor.h"
 #include "Temperatuur.h"
 
 PHSensor phSensor(A0);
 TemperatuurSensor TemperatuurSensor(3);
 
-#define sensorPin A4 // Digital pin connected to the sensor's output
+WaterFlow WaterflowSensor(A5, 7.5); // Digital pin connected to the sensor's output
 volatile int pulseCount; // Volatile because it is in an interrupt context
 
 // LoRaWAN NwkSKey, network session key
@@ -117,7 +118,7 @@ void do_scan(osjob_t* j) {
   Serial.print("Flow rate: ");
   Serial.print(flowRate);
   Serial.println(" L/min");
-
+  
   pulseCount=0;
 
   // Schedule next transmission
@@ -169,6 +170,7 @@ void setup() {
   phSensor.begin();
   Serial.println(F("Starting"));
 
+
 #ifdef VCC_ENABLE
   // For Pinoccio Scout boards
   pinMode(VCC_ENABLE, OUTPUT);
@@ -176,12 +178,11 @@ void setup() {
   delay(1000);
 #endif
 
-  pinMode(sensorPin, INPUT);
 
     // Enable PCIE1 Bit2 = 1 (Port C)
   PCICR |= B00000010;
   // Select PCINT12 Bit5 = 1 (Pin A4)
-  PCMSK1 |= B00010000;
+  PCMSK1 |= B00110000;
   // LMIC init
   os_init();
   // Reset the MAC state. Session and pending data transfers will be discarded.
