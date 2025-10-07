@@ -7,9 +7,11 @@
 #include "PHSensor.h"
 #include "Temperatuur.h"
 #include "LightSensor.h"
+#include "ECSensor.h"
 
 PHSensor phSensor(A0);
 TemperatuurSensor TemperatuurSensor(3);
+ECSensor ecSensor(A1);
 LightSensor LightSensor(A1);
 WaterFlow WaterflowSensor(A5, 7.5); // Digital pin connected to the sensor's output
 volatile int pulseCount; // Volatile because it is in an interrupt context
