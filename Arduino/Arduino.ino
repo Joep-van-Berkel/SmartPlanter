@@ -13,11 +13,13 @@ PHSensor phSensor(A0);
 TemperatuurSensor TemperatuurSensor(3);
 ECSensor ecSensor(A1);
 LightSensor LightSensor(A2);
-WaterFlow WaterflowSensor(A5, 7.5); // Digital pin connected to the sensor's output
-volatile int pulseCount; // Volatile because it is in an interrupt context
+WaterFlow WaterflowSensorBegin(A4, 7.5);
+WaterFlow WaterflowSensorEind (A5, 7.5); // Digital pin connected to the sensor's output
 
 //variables
-int  roundFlow;
+int  roundFlowBegin, roundFlowEind;
+volatile int pulseCountBegin, pulseCountEind; // Volatile because it is in an interrupt context
+bool stateBegin, stateEind;
 
 // LoRaWAN NwkSKey, network session key
 // This is the default Semtech key, which is used by the early prototype TTN
@@ -121,13 +123,19 @@ void onEvent(ev_t ev) {
 }
 
 void do_scan(osjob_t* j) {
-  float flowRate = pulseCount / 7.5;
-  roundFlow = (int)round(flowRate);
+  float flowRateBegin = pulseCountBegin / 7.5;
+  float flowRateEind = pulseCountEind / 7.5;
+  roundFlowBegin = (int)round(flowRateBegin);
+  roundFlowEind = (int)round(flowRateEind);
   // Serial.print("Flow rate: ");
   // Serial.print(roundFlow);
   // Serial.println(" L/min");
+
+  Serial.println("begin = " + String(roundFlowBegin));
+  Serial.println("eind  = " + String(roundFlowEind));
   
-  pulseCount=0;
+  pulseCountBegin=0;
+  pulseCountEind=0;
 
   // Schedule next transmission
   os_setTimedCallback(&scanjob, os_getTime() + sec2osticks(SCAN_INTERVAL), do_scan);
@@ -141,8 +149,8 @@ void do_send(osjob_t* j) {
     float phValue = phSensor.readPH();
     float temperatuurValue = TemperatuurSensor.readTemperatureC();
     uint16_t lightVal = LightSensor.readLight(); //lichtsensor
-    uint8_t startFlow = roundFlow;  //1e flowsensor
-    uint8_t endFlow = roundFlow; //Veranderen naar 2e sensor wanneer deze beschikbaar is
+    uint8_t startFlow = roundFlowBegin;  //1e flowsensor
+    uint8_t endFlow = roundFlowEind; //Veranderen naar 2e sensor wanneer deze beschikbaar is
     float ecVal = ecSensor.readEC(); 
 
     // Converteer naar integer 
@@ -164,7 +172,7 @@ void do_send(osjob_t* j) {
     payload[4] = highByte(lightVal);
     payload[5] = lowByte(lightVal);
     payload[6] = startFlow;
-    payload[7] = endFlow - 10;
+    payload[7] = endFlow;
     payload[8] = highByte(ecInt);
     payload[9] = lowByte(ecInt);
 
@@ -182,7 +190,27 @@ ISR (PCINT1_vect)
 {
   // Interrupt for Port C
   // Invert toggle state
-    pulseCount++;
+  bool reading = digitalRead(A4);
+  if (reading && !stateBegin) {
+    pulseCountBegin = pulseCountBegin + digitalRead(A4);
+    stateBegin = !stateBegin;
+  }
+  if (!reading && stateBegin) {
+    stateBegin = !stateBegin;
+  }
+
+  bool reading2 = digitalRead(A5);
+  if (reading2 && !stateEind) {
+    pulseCountEind = pulseCountEind + digitalRead(A5);
+    stateEind = !stateEind;
+  }
+  if (!reading2 && stateEind) {
+    stateEind = !stateEind;
+  }
+    // pulseCountBegin = pulseCountBegin + digitalRead(A4);
+    // pulseCountEind = pulseCountEind + digitalRead(A5);
+
+
 }
 
 
@@ -190,7 +218,8 @@ void setup() {
   Serial.begin(115200);
   phSensor.begin();
   TemperatuurSensor.begin();
-  WaterflowSensor.begin();
+  WaterflowSensorBegin.begin();
+  WaterflowSensorEind.begin();
   Serial.println(F("Starting"));
 
 
@@ -204,7 +233,7 @@ void setup() {
 
     // Enable PCIE1 Bit2 = 1 (Port C)
   PCICR |= B00000010;
-  // Select PCINT12 Bit5 = 1 (Pin A4)
+  // Select PCINT12 Bit5 = 1 (Pin A4 + A5)
   PCMSK1 |= B00110000;
   // LMIC init
   os_init();
