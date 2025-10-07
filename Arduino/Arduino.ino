@@ -6,18 +6,14 @@
 #include "Waterflow.h"
 #include "PHSensor.h"
 #include "Temperatuur.h"
-#include "LightSensor.h"
 #include "ECSensor.h"
 
 PHSensor phSensor(A0);
 TemperatuurSensor TemperatuurSensor(3);
 ECSensor ecSensor(A1);
-LightSensor LightSensor(A1);
+
 WaterFlow WaterflowSensor(A5, 7.5); // Digital pin connected to the sensor's output
 volatile int pulseCount; // Volatile because it is in an interrupt context
-
-//variables
-int  roundFlow;
 
 // LoRaWAN NwkSKey, network session key
 // This is the default Semtech key, which is used by the early prototype TTN
@@ -122,7 +118,7 @@ void onEvent(ev_t ev) {
 
 void do_scan(osjob_t* j) {
   float flowRate = pulseCount / 7.5;
-  roundFlow = (int)round(flowRate);
+  int  roundFlow = (int)round(flowRate);
   Serial.print("Flow rate: ");
   Serial.print(roundFlow);
   Serial.println(" L/min");
@@ -139,29 +135,21 @@ void do_send(osjob_t* j) {
     // sensor waarde ophalen
     float phValue = phSensor.readPH();
     float temperatuurValue = TemperatuurSensor.readTemperatureC();
-    uint16_t lightVal = LightSensor.readLight(); //lichtsensor
-    uint8_t startFlow = roundFlow;  //1e flowsensor
-    uint8_t endFlow = roundFlow; //Veranderen naar 2e sensor wanneer deze beschikbaar is
-    uint16_t ecVal = 30; //Veranderen naar nodigheid van EC sensor
+    float ecValue = ecSensor.readEC();
 
     // Converteer naar integer (x100 voor 2 decimalen)
     uint16_t phInt = (uint16_t)(phValue * 100);
-    
-    // Conventeer naar integer 
-    uint16_t  tempInt = temperatuurValue * 100;  
+    uint16_t tempInt = (uint16_t)(temperatuurValue * 100);
+    uint16_t ecInt = (uint16_t)(ecValue * 100);
 
-    // Bouw payload (9 bytes)
-    uint8_t payload[9];
+    // Bouw payload (6 bytes)
+    uint8_t payload[6];
     payload[0] = highByte(phInt);
     payload[1] = lowByte(phInt);
     payload[2] = highByte(tempInt);
     payload[3] = lowByte(tempInt);
-    payload[4] = highByte(lightVal);
-    payload[5] = lowByte(lightVal);
-    payload[6] = highByte(startFlow);
-    payload[7] = lowByte(endFlow);
-    payload[8] = highByte(ecVal);
-    payload[9] = lowByte(ecVal);
+    payload[4] = highByte(ecInt);
+    payload[5] = lowByte(ecInt);
 
     // Check of er al een TX bezig is
     if (LMIC.opmode & OP_TXRXPEND) {
@@ -169,7 +157,11 @@ void do_send(osjob_t* j) {
     } else {
         LMIC_setTxData2(1, payload, sizeof(payload), 0);
         Serial.print(F("Packet queued, pH="));
-        Serial.println(phValue, 2);
+        Serial.print(phValue, 2);
+        Serial.print(F(", Temp="));
+        Serial.print(temperatuurValue, 2);
+        Serial.print(F(", EC="));
+        Serial.println(ecValue, 2);
     }
 }
 
@@ -186,6 +178,7 @@ void setup() {
   phSensor.begin();
   TemperatuurSensor.begin();
   WaterflowSensor.begin();
+  ecSensor.begin();
   Serial.println(F("Starting"));
 
 
