@@ -12,7 +12,7 @@
 PHSensor phSensor(A0);
 TemperatuurSensor TemperatuurSensor(3);
 ECSensor ecSensor(A1);
-LightSensor LightSensor(A1);
+LightSensor LightSensor(A2);
 WaterFlow WaterflowSensor(A5, 7.5); // Digital pin connected to the sensor's output
 volatile int pulseCount; // Volatile because it is in an interrupt context
 
@@ -123,9 +123,9 @@ void onEvent(ev_t ev) {
 void do_scan(osjob_t* j) {
   float flowRate = pulseCount / 7.5;
   roundFlow = (int)round(flowRate);
-  Serial.print("Flow rate: ");
-  Serial.print(roundFlow);
-  Serial.println(" L/min");
+  // Serial.print("Flow rate: ");
+  // Serial.print(roundFlow);
+  // Serial.println(" L/min");
   
   pulseCount=0;
 
@@ -136,19 +136,24 @@ void do_scan(osjob_t* j) {
 
 
 void do_send(osjob_t* j) {
+
     // sensor waarde ophalen
     float phValue = phSensor.readPH();
     float temperatuurValue = TemperatuurSensor.readTemperatureC();
     uint16_t lightVal = LightSensor.readLight(); //lichtsensor
     uint8_t startFlow = roundFlow;  //1e flowsensor
     uint8_t endFlow = roundFlow; //Veranderen naar 2e sensor wanneer deze beschikbaar is
-    uint16_t ecVal = 30; //Veranderen naar nodigheid van EC sensor
+    float ecVal = ecSensor.readEC(); 
 
-    // Converteer naar integer (x100 voor 2 decimalen)
+    // Converteer naar integer 
     uint16_t phInt = (uint16_t)(phValue * 100);
     
     // Conventeer naar integer 
     uint16_t  tempInt = temperatuurValue * 100;  
+
+    uint16_t ecInt = ecVal * 100;
+
+    Serial.println(temperatuurValue);
 
     // Bouw payload (9 bytes)
     uint8_t payload[9];
@@ -158,10 +163,10 @@ void do_send(osjob_t* j) {
     payload[3] = lowByte(tempInt);
     payload[4] = highByte(lightVal);
     payload[5] = lowByte(lightVal);
-    payload[6] = highByte(startFlow);
-    payload[7] = lowByte(endFlow);
-    payload[8] = highByte(ecVal);
-    payload[9] = lowByte(ecVal);
+    payload[6] = startFlow;
+    payload[7] = endFlow - 10;
+    payload[8] = highByte(ecInt);
+    payload[9] = lowByte(ecInt);
 
     // Check of er al een TX bezig is
     if (LMIC.opmode & OP_TXRXPEND) {
