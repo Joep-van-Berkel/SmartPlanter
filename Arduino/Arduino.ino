@@ -127,12 +127,9 @@ void do_scan(osjob_t* j) {
   float flowRateEind = pulseCountEind / 7.5;
   roundFlowBegin = (int)round(flowRateBegin);
   roundFlowEind = (int)round(flowRateEind);
-  // Serial.print("Flow rate: ");
-  // Serial.print(roundFlow);
-  // Serial.println(" L/min");
 
-  Serial.println("begin = " + String(roundFlowBegin));
-  Serial.println("eind  = " + String(roundFlowEind));
+  // Serial.println("begin = " + String(roundFlowBegin));
+  // Serial.println("eind  = " + String(roundFlowEind));
   
   pulseCountBegin=0;
   pulseCountEind=0;
@@ -146,8 +143,8 @@ void do_scan(osjob_t* j) {
 void do_send(osjob_t* j) {
 
     // sensor waarde ophalen
-    float phValue = phSensor.readPH();
     float temperatuurValue = TemperatuurSensor.readTemperatureC();
+    float phValue = phSensor.readPH(temperatuurValue);
     uint16_t lightVal = LightSensor.readLight(); //lichtsensor
     uint8_t startFlow = roundFlowBegin;  //1e flowsensor
     uint8_t endFlow = roundFlowEind; //Veranderen naar 2e sensor wanneer deze beschikbaar is
@@ -160,8 +157,6 @@ void do_send(osjob_t* j) {
     uint16_t  tempInt = temperatuurValue * 100;  
 
     uint16_t ecInt = ecVal * 100;
-
-    Serial.println(temperatuurValue);
 
     // Bouw payload (9 bytes)
     uint8_t payload[9];
@@ -181,8 +176,6 @@ void do_send(osjob_t* j) {
         Serial.println(F("OP_TXRXPEND, not sending"));
     } else {
         LMIC_setTxData2(1, payload, sizeof(payload), 0);
-        Serial.print(F("Packet queued, pH="));
-        Serial.println(phValue, 2);
     }
 }
 
@@ -207,10 +200,6 @@ ISR (PCINT1_vect)
   if (!reading2 && stateEind) {
     stateEind = !stateEind;
   }
-    // pulseCountBegin = pulseCountBegin + digitalRead(A4);
-    // pulseCountEind = pulseCountEind + digitalRead(A5);
-
-
 }
 
 
@@ -220,8 +209,6 @@ void setup() {
   TemperatuurSensor.begin();
   WaterflowSensorBegin.begin();
   WaterflowSensorEind.begin();
-  Serial.println(F("Starting"));
-
 
 #ifdef VCC_ENABLE
   // For Pinoccio Scout boards

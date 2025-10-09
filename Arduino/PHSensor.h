@@ -7,7 +7,7 @@ class PHSensor {
   public:
     PHSensor(int pin);
     void begin();
-    float readPH(float temperature = 20.0); // default temp
+    float readPH(float temperature); // default temp
   private:
     int _pin;
     DFRobot_PH _ph;
