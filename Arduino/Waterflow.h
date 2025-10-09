@@ -6,32 +6,28 @@
 
 class WaterFlow {
 public:
-    WaterFlow(byte pinIn, float calibrationFactor = 7.5);
+    // Constructor met pin en calibratiefactor
+    WaterFlow(byte pin, float calibrationFactor);
 
     void begin();
-    void update();
+    void calculateFlow();
 
-    int getFlow() { return (int)round(flowRateIn); }
+    int getFlowInt() { return (int)round(flowRate); }
+    float getFlow() { return flowRate; }
 
-    float getFlowIn()  { return flowRateIn; }
-    float getDifference() { return flowRateIn; }
+private:
+    byte pin;
+    float calibrationFactor;
 
-  private:
-    byte pinIn;
-
-    volatile unsigned long pulseCountIn;
+    volatile unsigned long pulseCount;
     float flowRate;
-    float minFlow;
-
-    float calibrationFactor; // meestal rond 7.5, maar testen!
 
     unsigned long lastTime;
-    float flowRateIn;
 
-    // pointers om naar huidig object te verwijzen
     static WaterFlow* instance;
 
+    // ISR
+    static void pulseCounter();
 };
-
 
 #endif

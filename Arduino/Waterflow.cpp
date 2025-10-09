@@ -2,36 +2,42 @@
 
 WaterFlow* WaterFlow::instance = nullptr;
 
-WaterFlow::WaterFlow(byte pinIn, float calibrationFactor) {
-  this->pinIn = pinIn;
+WaterFlow::WaterFlow(byte pin, float calibrationFactor) {
+  this->pin = pin;
   this->calibrationFactor = calibrationFactor;
 
-  pulseCountIn = 0;
-  flowRateIn = 0;
-
+  pulseCount = 0;
+  flowRate = 0.0;
   lastTime = 0;
 
-  instance = this; // zodat de static interrupt toegang heeft
+  instance = this;
 }
 
 void WaterFlow::begin() {
-  pinMode(pinIn, INPUT_PULLUP);
-
+  pinMode(pin, INPUT_PULLUP);
+  attachInterrupt(digitalPinToInterrupt(pin), WaterFlow::pulseCounter, FALLING);
+  lastTime = millis();
 }
 
-void WaterFlow::update() {
+void WaterFlow::pulseCounter() {
+  if (instance != nullptr) {
+    instance->pulseCount++;
+  }
+}
+
+void WaterFlow::calculateFlow() {
   unsigned long currentTime = millis();
   unsigned long timePassed = currentTime - lastTime;
 
-  if (timePassed >= 1000) { // elke seconde berekenen
+  if (timePassed >= 1000) {
     noInterrupts();
-    unsigned long pulsesIn = pulseCountIn;
-    pulseCountIn = 0;
+    unsigned long pulses = pulseCount;
+    pulseCount = 0;
     interrupts();
 
-    flowRateIn  = ((float)pulsesIn  / calibrationFactor);
+    // Bereken L/min
+    flowRate = ((float)pulses / calibrationFactor);
 
     lastTime = currentTime;
   }
 }
-
