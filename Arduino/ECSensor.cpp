@@ -1,6 +1,10 @@
 #include "ECSensor.h"
 #include <Arduino.h>
 
+// Calibration factor to scale EC so that a known solution reads correctly
+// This maps an observed reading of 7.68 mS/cm to the expected 12.88 mS/cm
+static const float EC_CALIBRATION_FACTOR = 12.88f / 7.68f;
+
 ECSensor::ECSensor(int pin) {
     _pin = pin;
 }
@@ -16,6 +20,8 @@ float ECSensor::readEC() {
     // Example conversion: (calibration needed for your sensor)
     // For DFRobot SEN0244: EC (mS/cm) = (voltage - 0.4) * 6.25
     float ec = (voltage - 0.4) * 6.25;    
+    // Apply single-point calibration scaling
+    ec *= EC_CALIBRATION_FACTOR;
     if (ec < 0) ec = 0;
     return ec;
 }
