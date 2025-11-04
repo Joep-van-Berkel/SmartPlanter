@@ -2,8 +2,8 @@
 #include <Arduino.h>
 
 // Calibration factor to scale EC so that a known solution reads correctly
-// This maps an observed reading of 7.68 mS/cm to the expected 12.88 mS/cm
-static const float EC_CALIBRATION_FACTOR = 12.88f / 7.68f;
+// This maps the current observed reading of 17.92 mS/cm to the expected 12.88 mS/cm
+static const float EC_CALIBRATION_FACTOR = 12.88f / 17.92f; // ≈ 0.71875
 
 ECSensor::ECSensor(int pin) {
     _pin = pin;
