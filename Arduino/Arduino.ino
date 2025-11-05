@@ -14,7 +14,7 @@ TemperatuurSensor TemperatuurSensor(3);
 ECSensor ecSensor(A1);
 LightSensor LightSensor(A2);
 WaterFlow WaterflowSensorBegin(A4, 7.5);
-WaterFlow WaterflowSensorEind (A5, 7.5); // Digital pin connected to the sensor's output
+WaterFlow WaterflowSensorEind (A5, 7.5); 
 
 //variables
 int  roundFlowBegin, roundFlowEind;
@@ -123,14 +123,17 @@ void onEvent(ev_t ev) {
 }
 
 void do_scan(osjob_t* j) {
+  // Hier worden de pulsen geteld en berekent 
   float flowRateBegin = pulseCountBegin / 7.5;
   float flowRateEind = pulseCountEind / 7.5;
+  // Hier worden de komma getallen afgerond naar hele getallen, op die manier zijn het kleinere datapakketjes.
   roundFlowBegin = (int)round(flowRateBegin);
   roundFlowEind = (int)round(flowRateEind);
 
   // Serial.println("begin = " + String(roundFlowBegin));
   // Serial.println("eind  = " + String(roundFlowEind));
   
+  // Hier worden de pulsen weer omgezet naar 0 voor de volgende meeting.
   pulseCountBegin=0;
   pulseCountEind=0;
 
@@ -183,11 +186,14 @@ ISR (PCINT1_vect)
 {
   // Interrupt for Port C
   // Invert toggle state
+
+  // Als de reading hoog is 1 van de 0 of 1 én de statebegin staat uit doe er dan een bij -> doe daarna de statebegin aan en check of de pulse bezig is. 
   bool reading = digitalRead(A4);
   if (reading && !stateBegin) {
     pulseCountBegin = pulseCountBegin + digitalRead(A4);
     stateBegin = !stateBegin;
   }
+  // als de reading laag is en de beginstate staat uit dan moet de beginstate uit zodat die klaar is voor weer een hoge pulse
   if (!reading && stateBegin) {
     stateBegin = !stateBegin;
   }
@@ -218,7 +224,7 @@ void setup() {
 #endif
 
 
-    // Enable PCIE1 Bit2 = 1 (Port C)
+// Enable PCIE1 Bit2 = 1 (Port C) ->Hier worden de pin change interrupts ingeschakeld, ze worden interruptgevoelig, zodat de Arduino een melding krijgt zodra de sensorpuls verandert.
   PCICR |= B00000010;
   // Select PCINT12 Bit5 = 1 (Pin A4 + A5)
   PCMSK1 |= B00110000;
