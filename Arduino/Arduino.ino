@@ -14,7 +14,7 @@ TemperatuurSensor TemperatuurSensor(3);
 ECSensor ecSensor(A1);
 LightSensor LightSensor(A2);
 WaterFlow WaterflowSensorBegin(A4, 7.5);
-WaterFlow WaterflowSensorEind (A5, 7.5); 
+WaterFlow WaterflowSensorEind (A5, 7.5); // Digital pin connected to the sensor's output
 
 //variables
 int  roundFlowBegin, roundFlowEind;
@@ -186,14 +186,11 @@ ISR (PCINT1_vect)
 {
   // Interrupt for Port C
   // Invert toggle state
-
-  // Als de reading hoog is 1 van de 0 of 1 én de statebegin staat uit doe er dan een bij -> doe daarna de statebegin aan en check of de pulse bezig is. 
   bool reading = digitalRead(A4);
   if (reading && !stateBegin) {
     pulseCountBegin = pulseCountBegin + digitalRead(A4);
     stateBegin = !stateBegin;
   }
-  // als de reading laag is en de beginstate staat uit dan moet de beginstate uit zodat die klaar is voor weer een hoge pulse
   if (!reading && stateBegin) {
     stateBegin = !stateBegin;
   }
@@ -206,6 +203,10 @@ ISR (PCINT1_vect)
   if (!reading2 && stateEind) {
     stateEind = !stateEind;
   }
+    // pulseCountBegin = pulseCountBegin + digitalRead(A4);
+    // pulseCountEind = pulseCountEind + digitalRead(A5);
+
+
 }
 
 
