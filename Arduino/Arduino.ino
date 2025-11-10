@@ -123,17 +123,17 @@ void onEvent(ev_t ev) {
 }
 
 void do_scan(osjob_t* j) {
+  // Hier worden de pulsen geteld en berekent 
   float flowRateBegin = pulseCountBegin / 7.5;
   float flowRateEind = pulseCountEind / 7.5;
+  // Hier worden de komma getallen afgerond naar hele getallen, op die manier zijn het kleinere datapakketjes.
   roundFlowBegin = (int)round(flowRateBegin);
   roundFlowEind = (int)round(flowRateEind);
-  // Serial.print("Flow rate: ");
-  // Serial.print(roundFlow);
-  // Serial.println(" L/min");
 
-  Serial.println("begin = " + String(roundFlowBegin));
-  Serial.println("eind  = " + String(roundFlowEind));
+  // Serial.println("begin = " + String(roundFlowBegin));
+  // Serial.println("eind  = " + String(roundFlowEind));
   
+  // Hier worden de pulsen weer omgezet naar 0 voor de volgende meeting.
   pulseCountBegin=0;
   pulseCountEind=0;
 
@@ -146,8 +146,8 @@ void do_scan(osjob_t* j) {
 void do_send(osjob_t* j) {
 
     // sensor waarde ophalen
-    float phValue = phSensor.readPH();
     float temperatuurValue = TemperatuurSensor.readTemperatureC();
+    float phValue = phSensor.readPH(temperatuurValue);
     uint16_t lightVal = LightSensor.readLight(); //lichtsensor
     uint8_t startFlow = roundFlowBegin;  //1e flowsensor
     uint8_t endFlow = roundFlowEind; //Veranderen naar 2e sensor wanneer deze beschikbaar is
@@ -160,8 +160,6 @@ void do_send(osjob_t* j) {
     uint16_t  tempInt = temperatuurValue * 100;  
 
     uint16_t ecInt = ecVal * 100;
-
-    Serial.println(temperatuurValue);
 
     // Bouw payload (9 bytes)
     uint8_t payload[9];
@@ -181,8 +179,6 @@ void do_send(osjob_t* j) {
         Serial.println(F("OP_TXRXPEND, not sending"));
     } else {
         LMIC_setTxData2(1, payload, sizeof(payload), 0);
-        Serial.print(F("Packet queued, pH="));
-        Serial.println(phValue, 2);
     }
 }
 
@@ -220,8 +216,6 @@ void setup() {
   TemperatuurSensor.begin();
   WaterflowSensorBegin.begin();
   WaterflowSensorEind.begin();
-  Serial.println(F("Starting"));
-
 
 #ifdef VCC_ENABLE
   // For Pinoccio Scout boards
@@ -231,7 +225,7 @@ void setup() {
 #endif
 
 
-    // Enable PCIE1 Bit2 = 1 (Port C)
+// Enable PCIE1 Bit2 = 1 (Port C) ->Hier worden de pin change interrupts ingeschakeld, ze worden interruptgevoelig, zodat de Arduino een melding krijgt zodra de sensorpuls verandert.
   PCICR |= B00000010;
   // Select PCINT12 Bit5 = 1 (Pin A4 + A5)
   PCMSK1 |= B00110000;
