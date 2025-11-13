@@ -12,7 +12,7 @@
 PHSensor phSensor(A0);
 TemperatuurSensor TemperatuurSensor(3);
 ECSensor ecSensor(A1);
-LightSensor LightSensor(A2);
+LightSensor LightSensor(A2, 5);
 WaterFlow WaterflowSensorBegin(A4, 7.5);
 WaterFlow WaterflowSensorEind (A5, 7.5); // Digital pin connected to the sensor's output
 
@@ -20,6 +20,8 @@ WaterFlow WaterflowSensorEind (A5, 7.5); // Digital pin connected to the sensor'
 int  roundFlowBegin, roundFlowEind;
 volatile int pulseCountBegin, pulseCountEind; // Volatile because it is in an interrupt context
 bool stateBegin, stateEind;
+
+int ledThreshold = 800;  //Threshold for toggling lights
 
 // LoRaWAN NwkSKey, network session key
 // This is the default Semtech key, which is used by the early prototype TTN
@@ -137,6 +139,9 @@ void do_scan(osjob_t* j) {
   pulseCountBegin=0;
   pulseCountEind=0;
 
+  //checkt licht elke seconde
+  LightSensor.checkLight(ledThreshold);
+
   // Schedule next transmission
   os_setTimedCallback(&scanjob, os_getTime() + sec2osticks(SCAN_INTERVAL), do_scan);
 
@@ -209,13 +214,13 @@ ISR (PCINT1_vect)
 
 }
 
-
 void setup() {
   Serial.begin(115200);
   phSensor.begin();
   TemperatuurSensor.begin();
   WaterflowSensorBegin.begin();
   WaterflowSensorEind.begin();
+  LightSensor.ledSetup();
 
 #ifdef VCC_ENABLE
   // For Pinoccio Scout boards
