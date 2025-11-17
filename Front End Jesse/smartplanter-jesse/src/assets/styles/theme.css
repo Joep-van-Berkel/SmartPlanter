@@ -1,0 +1,12 @@
+:root {
+  --bg: #FFFFFF;
+  --bg-gradient: linear-gradient(to bottom, #2b3e34, #31463a, #384e3f, #405744, #485f49, #4f654e, #566c52, #5e7257, #66785c, #6e7e62, #768467, #7e8a6d);
+  --blur: rgba(255, 255, 255, 0.05);
+  --light: #EEEEEE;
+  --text: #000000;
+  --danger: #FF4A4A;
+}
+
+.dark {
+  --bg: #000000
+}
