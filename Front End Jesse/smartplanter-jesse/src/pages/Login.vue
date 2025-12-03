@@ -4,7 +4,7 @@
     <div class="container">
         <img src="../images/logo.png"/>
         <h1>SmartPlanter</h1>
-        <a href="">Login</a>
+        <button>Login</button>
     </div>
   </div>
 </template>
@@ -16,7 +16,7 @@
 
 
 export default {
-  name: 'App',
+  name: 'LoginPage',
   components: {
   }
 }
@@ -36,7 +36,6 @@ export default {
         display: flex;
         align-items: center;
         justify-content: center;
-        font-family: Verdana ;
         overflow-y: hidden;
     }
 
@@ -60,7 +59,7 @@ export default {
         user-select: none;
     }
 
-    .container a {
+    .container button {
         display: flex;
         text-decoration: none;
         width: 15rem;
@@ -73,6 +72,7 @@ export default {
         margin: 2rem;
         font-weight: 400;
         user-select: none;
+        cursor: pointer;
     }
 
     .container img {

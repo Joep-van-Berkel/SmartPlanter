@@ -1,12 +1,23 @@
 :root {
-  --bg: #FFFFFF;
-  --bg-gradient: linear-gradient(to bottom, #2b3e34, #31463a, #384e3f, #405744, #485f49, #4f654e, #566c52, #5e7257, #66785c, #6e7e62, #768467, #7e8a6d);
-  --blur: rgba(255, 255, 255, 0.05);
-  --light: #EEEEEE;
-  --text: #000000;
+  --primary: #63ff77;
+  --primary-dark: color-mix(in srgb, var(--primary) 30%, black);
+  --bg: #f5f5f5;
+  --hover: #f5f5f5;
+  --blur: rgba(0, 0, 0, 0.2);
+  --light: #FFFFFF;
+  --text: #262626;
+  --icon: #262626;
   --danger: #FF4A4A;
 }
 
 .dark {
-  --bg: #000000
+  --primary: #63ff77;
+  --primary-dark: color-mix(in srgb, var(--primary) 30%, black);
+  --bg: #000;
+  --hover: #202020;
+  --blur: rgba(0, 0, 0, 0.2);
+  --light: #141414;
+  --text: #fff;
+  --icon: #fff;
+  --danger: #FF4A4A;
 }
