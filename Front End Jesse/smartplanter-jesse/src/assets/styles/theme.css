@@ -1,0 +1,23 @@
+:root {
+  --primary: #63ff77;
+  --primary-dark: color-mix(in srgb, var(--primary) 30%, black);
+  --bg: #f5f5f5;
+  --hover: #f5f5f5;
+  --blur: rgba(0, 0, 0, 0.2);
+  --light: #FFFFFF;
+  --text: #262626;
+  --icon: #262626;
+  --danger: #FF4A4A;
+}
+
+.dark {
+  --primary: #63ff77;
+  --primary-dark: color-mix(in srgb, var(--primary) 30%, black);
+  --bg: #000;
+  --hover: #202020;
+  --blur: rgba(0, 0, 0, 0.2);
+  --light: #141414;
+  --text: #fff;
+  --icon: #fff;
+  --danger: #FF4A4A;
+}
