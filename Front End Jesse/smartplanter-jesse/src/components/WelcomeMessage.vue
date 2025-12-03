@@ -1,7 +1,7 @@
 <template>
 
     <div class="welcomeMessage">
-        <h1>Hallo,</h1><span>Username</span>
+        <h1>Hallo,</h1><span>Jesse de Poot</span>
     </div>
 
 </template>
