@@ -23,6 +23,6 @@ export default {
 
 <style>
 h1{
-  color:white
+  color:rgb(0, 0, 0);
 }
 </style>
