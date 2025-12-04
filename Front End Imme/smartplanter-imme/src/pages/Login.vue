@@ -5,7 +5,7 @@
     </div>
 
     <div class="imageLogo">
-      <img src="../assets/SmartplanterLogo.png" alt="smartplanterLogo" class="smartplanter-img"/>
+      <img src="../assets/SmartplanterLogo.png" alt="smartplanterLogo" class="smartplanter-img">
     </div>
 
     <div class="centerKnop">

@@ -28,7 +28,7 @@ export default {
   justify-content: space-between;
   gap: 20px;
   background: #1f4936;
-  padding: 15px 25px;
+  padding: 10px 20px;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   color:white;
 }
@@ -71,6 +71,7 @@ export default {
 }
 
 span1, span2 {
+  font-weight: 300;
   display: block;
 }
 

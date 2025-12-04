@@ -35,4 +35,9 @@ footer {
   margin-top: auto;
 }
 
+body {
+  background: #8cc68d62;
+  /*background: #9dffb17d; */
+}
+
 </style>
