@@ -79,8 +79,8 @@
 
       <PlantCard
       name="Wortel"
-      position="11"
-      days-to-harvest="12"
+      position="10"
+      days-to-harvest="11"
       plant-date="26-11-2025"
       -harvest-date="13-12-2025"/>
 
@@ -91,63 +91,11 @@
       plant-date="26-11-2025"
       -harvest-date="13-12-2025"/>
 
-      <PlantCard
-      name="Wortel"
-      position="13"
-      days-to-harvest="12"
-      plant-date="26-11-2025"
-      -harvest-date="13-12-2025"/>
 
-      <PlantCard
-      name="Wortel"
-      position="14"
-      days-to-harvest="12"
-      plant-date="26-11-2025"
-      -harvest-date="13-12-2025"/>
 
-      <PlantCard
-      name="Wortel"
-      position="15"
-      days-to-harvest="12"
-      plant-date="26-11-2025"
-      -harvest-date="13-12-2025"/>
-
-      <PlantCard
-      name="Wortel"
-      position="11"
-      days-to-harvest="12"
-      plant-date="26-11-2025"
-      -harvest-date="13-12-2025"/>
-
-      <PlantCard
-      name="Wortel"
-      position="12"
-      days-to-harvest="12"
-      plant-date="26-11-2025"
-      -harvest-date="13-12-2025"/>
-
-      <PlantCard
-      name="Wortel"
-      position="13"
-      days-to-harvest="12"
-      plant-date="26-11-2025"
-      -harvest-date="13-12-2025"/>
-
-      <PlantCard
-      name="Wortel"
-      position="14"
-      days-to-harvest="12"
-      plant-date="26-11-2025"
-      -harvest-date="13-12-2025"/>
-
-      <PlantCard
-      name="Wortel"
-      position="15"
-      days-to-harvest="12"
-      plant-date="26-11-2025"
-      -harvest-date="13-12-2025"/>
 
       
+    
     </div>
   </div>
   

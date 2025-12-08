@@ -94,6 +94,7 @@ export default {
 
   .themeContainer h2 {
     color: var(--text);
+    font-size: 1.5rem;
   }
 
   .themeContainer .btnTheme {

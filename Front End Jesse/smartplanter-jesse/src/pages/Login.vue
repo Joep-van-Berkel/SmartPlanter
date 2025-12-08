@@ -2,9 +2,9 @@
   <SidebarNavbar/>
   <div class="page">
     <div class="container">
-        <img src="../images/logo.png"/>
+        <i class="fa-solid fa-seedling"></i>
         <h1>SmartPlanter</h1>
-        <button>Login</button>
+        <a href="http://localhost:8080/dashboard">Login</a>
     </div>
   </div>
 </template>
@@ -30,7 +30,7 @@ export default {
     }
 
     .page {
-        background: url(../images/bg.jpg);
+        background: var(--bg);
         height: 100vh;
         width: auto;
         display: flex;
@@ -48,26 +48,26 @@ export default {
         width: 25rem;
         height: 30rem;
         backdrop-filter: blur(2px);
-        background: var(--blur);
+        background: var(--light);
         padding: 20px;
         border-radius: 3rem;
     }
 
     .container h1 {
-        color: var(--light);
+        color: var(--text);
         font-size: 3rem;
         user-select: none;
     }
 
-    .container button {
+    .container a {
         display: flex;
         text-decoration: none;
         width: 15rem;
-        background: var(--light) ;
+        background: var(--primary) ;
         font-size: 4rem;
-        color: var(--text);
-        border: 2px solid var(--blur);
-        border-radius: 10px;
+        color: var(--primary-dark);
+        border: 2px solid var(--primary-dark);
+        border-radius: 50px;
         justify-content: center;    
         margin: 2rem;
         font-weight: 400;
@@ -75,10 +75,11 @@ export default {
         cursor: pointer;
     }
 
-    .container img {
-        width: 10rem;
+    .container i {
+        font-size: 10rem;
         height: auto;
         user-select: none;
+        color: var(--primary);
     }
 
 </style>

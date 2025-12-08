@@ -37,5 +37,25 @@ body {
   color: var(--primary-dark); /* tekstkleur tijdens selectie */
 }
 
+/* width */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  background: var(--primary-dark);
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: var(--primary);
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: var(--primary);
+}
+
 
 </style>

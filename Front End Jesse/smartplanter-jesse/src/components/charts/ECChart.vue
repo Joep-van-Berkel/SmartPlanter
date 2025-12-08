@@ -1,6 +1,8 @@
 <template>
 <div class="linechart">
     <canvas ref="canvasEl"></canvas>
+    <p>Laatste Waarde: <span>30</span></p>
+  <p>Waarde status:<span>OK</span></p>
 </div>
 </template>
 
@@ -56,6 +58,10 @@ new Chart(canvasEl.value, {
     height: 15rem;
     border-radius: 15px;
     margin: 1rem;
+}
+
+.linechart p {
+  color: var(--text);
 }
 
 </style>
