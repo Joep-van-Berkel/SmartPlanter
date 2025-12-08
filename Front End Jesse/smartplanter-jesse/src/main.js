@@ -14,7 +14,7 @@ if (savedTheme === 'dark') document.documentElement.classList.add('dark')
 const keycloak = new Keycloak({
   url: 'https://141.148.237.73:8443/',
   realm: 'smartplanter',
-  clientId: 'frontend'
+  clientId: 'frontend-jesse'
 })
 
 // Alleen init om de instance beschikbaar te maken
