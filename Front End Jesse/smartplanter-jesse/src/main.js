@@ -1,28 +1,48 @@
+// main.js
 import { createApp } from 'vue'
 import App from './App.vue'
-import router from './router'
+import router from './router' // je router importeren
 import Keycloak from 'keycloak-js'
-import './assets/styles/theme.css'
 
-// Restore theme
-const savedColor = localStorage.getItem('primary-color')
-if (savedColor) document.documentElement.style.setProperty('--primary', savedColor)
-const savedTheme = localStorage.getItem('theme')
-if (savedTheme === 'dark') document.documentElement.classList.add('dark')
+// 1. Configuratie
+const initOptions = {
+  url: 'https://JOUW-KEYCLOAK-URL-HIER/',
+  realm: 'myrealm',
+  clientId: 'myvue',
+  onLoad: 'login-required' 
+}
 
-// Keycloak config (instance aanmaken, geen redirect)
-const keycloak = new Keycloak({
-  url: 'https://141.148.237.73:8443/',
-  realm: 'smartplanter',
-  clientId: 'frontend-jesse'
-})
+const keycloak = new Keycloak(initOptions)
 
-// Alleen init om de instance beschikbaar te maken
-keycloak.init({ checkLoginIframe: false, enableLogging: true })
-  .then(() => {
+// 2. Initialiseer Keycloak
+keycloak.init({ onLoad: initOptions.onLoad }).then((auth) => {
+  if (!auth) {
+    window.location.reload();
+  } else {
+    console.log("Authenticated");
+
     const app = createApp(App)
+
+    // Keycloak beschikbaar maken in de app
     app.config.globalProperties.$keycloak = keycloak
+
+    // 3. Voeg router toe **na authenticatie**
     app.use(router)
+
     app.mount('#app')
-  })
-  .catch(err => console.error('❌ Keycloak init failed', err))
+  }
+
+  // Token Refresh
+  setInterval(() => {
+    keycloak.updateToken(70).then((refreshed) => {
+      if (refreshed) {
+        console.log('Token refreshed ' + refreshed);
+      }
+    }).catch(() => {
+      console.error('Failed to refresh token');
+    });
+  }, 60000)
+
+}).catch(() => {
+  console.error("Authentication Failed");
+});
