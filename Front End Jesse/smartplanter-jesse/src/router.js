@@ -1,12 +1,10 @@
-import { createRouter, createWebHistory } from 'vue-router'
-import { keycloak, authState } from './keycloak'
-import { watch } from 'vue'
-
-import Login from './pages/Login.vue'
-import Dashboard from './pages/Dashboard.vue'
-import Notifications from './pages/Notifications.vue'
-import Data from './pages/Data.vue'
-import Settings from './pages/Settings.vue'
+import { createRouter, createWebHistory } from 'vue-router';
+import Login from './pages/Login.vue';
+import Dashboard from './pages/Dashboard.vue';
+import Notifications from './pages/Notifications.vue';
+import Data from './pages/Data.vue';
+import Settings from './pages/Settings.vue';
+import { keycloak } from './keycloak';
 
 const routes = [
   { path: '/', component: Login },
@@ -14,45 +12,34 @@ const routes = [
   { path: '/notifications', component: Notifications, meta: { requiresAuth: true } },
   { path: '/data', component: Data, meta: { requiresAuth: true } },
   { path: '/settings', component: Settings, meta: { requiresAuth: true, requiresRole: 'admin' } },
-]
+];
 
 const router = createRouter({
   history: createWebHistory(),
   routes,
-})
+});
 
-router.beforeEach(async (to, from, next) => {
-  // Wacht totdat Keycloak klaar is
-  if (authState.initializing) {
-    const stop = watch(
-      () => authState.initializing,
-      (done) => {
-        if (!done) {
-          stop()
-          next()
-        }
-      }
-    )
-    return
+// Navigation guard
+router.beforeEach((to, from, next) => {
+  if (to.meta.requiresAuth && !keycloak.authenticated) {
+    keycloak.login();
+    return;
   }
 
-  // Redirect ingelogde gebruiker weg van login pagina
-  if (to.path === '/' && authState.authenticated) {
-    return next('/dashboard')
+  if (to.meta.requiresRole) {
+    if (!keycloak.authenticated) {
+      keycloak.login();
+      return;
+    }
+
+    if (!keycloak.hasRealmRole(to.meta.requiresRole)) {
+      alert('⛔ Geen toegang! Je hebt geen admin rechten.');
+      next('/');
+      return;
+    }
   }
 
-  // Auth check
-  if (to.meta.requiresAuth && !authState.authenticated) {
-    return keycloak.login({ redirectUri: window.location.origin + to.fullPath })
-  }
+  next();
+});
 
-  // Role check
-  if (to.meta.requiresRole && (!authState.authenticated || !keycloak.hasRealmRole(to.meta.requiresRole))) {
-    alert('⛔ Geen toegang – onvoldoende rechten.')
-    return next('/')
-  }
-
-  next()
-})
-
-export default router
+export default router;

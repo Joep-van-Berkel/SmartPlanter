@@ -1,79 +1,57 @@
-import Keycloak from 'keycloak-js'
-import { reactive } from 'vue'
+// src/keycloak.js
+import Keycloak from 'keycloak-js';
+import { reactive } from 'vue';
 
-// --- Keycloak configuratie ---
-const initOptions = {
-  url: 'https://141.148.237.73:8443/', // PAS AAN
+const keycloakConfig = {
+  url: 'https://141.148.237.73:8443/',
   realm: 'smartplanter',
   clientId: 'frontend-jesse',
-}
+};
 
-// Keycloak instantie
-export const keycloak = new Keycloak(initOptions)
+export const keycloak = new Keycloak(keycloakConfig);
 
-// --- Globale reactive auth state ---
-export const authState = reactive({
-  initializing: true, // true totdat Keycloak klaar is
+export const auth = reactive({
+  initializing: true,
   authenticated: false,
   error: null,
-  userProfile: null,
-})
+  profile: null,
+});
 
-// --- Helper object voor Vue components ---
-export const auth = {
-  state: authState,
-
-  login: async (redirectUri = window.location.origin) => {
-    authState.initializing = true
-    try {
-      await keycloak.init({
-        onLoad: 'login-required',
-        pkceMethod: 'S256',
-        redirectUri,
-      })
-      authState.authenticated = keycloak.authenticated
-      authState.userProfile = await keycloak.loadUserProfile()
-    } catch (err) {
-      console.error('Keycloak login failed', err)
-      authState.error = err?.message || String(err)
-    } finally {
-      authState.initializing = false
+// Init Keycloak
+keycloak
+  .init({
+    onLoad: 'check-sso',              // check session without redirect
+    silentCheckSsoRedirectUri: window.location.origin + '/silent-check-sso.html',
+    pkceMethod: 'S256',
+  })
+  .then(async (authenticated) => {
+    auth.authenticated = authenticated;
+    if (authenticated) {
+      auth.profile = await keycloak.loadUserProfile();
     }
-  },
+  })
+  .catch((err) => {
+    console.error('Keycloak init failed', err);
+    auth.error = err?.message || String(err);
+  })
+  .finally(() => {
+    auth.initializing = false;
+  });
 
-  logout: (redirectUri = window.location.origin) => {
-    keycloak.logout({ redirectUri })
-    authState.authenticated = false
-    authState.userProfile = null
-  },
-
-  profile: async () => {
-    if (!keycloak.authenticated) return null
-    if (!authState.userProfile) {
-      authState.userProfile = await keycloak.loadUserProfile()
-    }
-    return authState.userProfile
-  },
-
-  hasRole: (role) => keycloak.hasRealmRole(role),
+// Helper functions
+export function login() {
+  keycloak.login();
 }
 
-// --- Soft init: check bestaande sessie zonder redirect ---
-export async function checkExistingSession() {
-  authState.initializing = true
-  try {
-    const authenticated = await keycloak.init({
-      onLoad: 'check-sso',
-      silentCheckSsoRedirectUri: window.location.origin + '/silent-check-sso.html',
-      pkceMethod: 'S256',
-    })
-    authState.authenticated = authenticated
-    if (authenticated) {
-      authState.userProfile = await keycloak.loadUserProfile()
-    }
-  } catch (err) {
-    console.warn('No existing session', err)
-  } finally {
-    authState.initializing = false
-  }
+export function logout() {
+  keycloak.logout({ redirectUri: window.location.origin });
+}
+
+export function hasRole(role) {
+  if (!keycloak.authenticated) return false;
+  return keycloak.hasRealmRole(role);
+}
+
+export function token() {
+  return keycloak.token;
 }
