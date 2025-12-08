@@ -23,7 +23,7 @@ const router = createRouter({
 // Navigation Guard
 router.beforeEach((to, from, next) => {
   if (to.meta.requiresAuth && !keycloak.authenticated) {
-    // Redirect naar Keycloak alleen bij beveiligde route
+    // Alleen redirect naar Keycloak bij beveiligde route
     keycloak.login()
   } else if (to.meta.requiresRole) {
     if (keycloak.hasRealmRole(to.meta.requiresRole)) next()

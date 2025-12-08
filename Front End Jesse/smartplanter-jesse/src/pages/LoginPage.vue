@@ -13,7 +13,7 @@ import { auth } from '../keycloak'
 export default {
   name: 'LoginPage',
   setup() {
-    const login = () => auth.login()
+    const login = () => auth.login() // redirect pas bij klik
     return { login }
   }
 }

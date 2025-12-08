@@ -1,4 +1,3 @@
-// src/keycloak.js
 import Keycloak from 'keycloak-js'
 
 const keycloak = new Keycloak({
@@ -17,7 +16,7 @@ export const auth = {
   // Init Keycloak zonder automatische redirect
   init() {
     return keycloak.init({
-      onLoad: 'check-sso', // check of gebruiker al ingelogd is, geen redirect
+      onLoad: 'check-sso', // check of er een sessie is, maar redirect niet automatisch
       pkceMethod: 'S256',
     })
     .then(authenticated => {
@@ -34,7 +33,7 @@ export const auth = {
   },
 
   login() {
-    keycloak.login()
+    keycloak.login() // redirect pas bij klik
   },
 
   logout() {
