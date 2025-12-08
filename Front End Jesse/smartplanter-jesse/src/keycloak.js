@@ -8,23 +8,22 @@ const keycloak = new Keycloak({
 
 const initKeycloak = (onAuthenticatedCallback) => {
   keycloak.init({
-    onLoad: 'login-required', // 'check-sso' als je login optioneel wilt
-    checkLoginIframe: false,   // voorkomt CORS issues
+    onLoad: 'login-required',   // of 'check-sso'
+    checkLoginIframe: false,
+    pkceMethod: 'S256',
   }).then(authenticated => {
     if (authenticated) {
       onAuthenticatedCallback()
     } else {
       keycloak.login()
     }
+  }).catch(err => {
+    console.error('Keycloak init failed', err)
   })
 }
 
-const logout = () => {
-  keycloak.logout()
-}
-
+const logout = () => keycloak.logout()
 const getToken = () => keycloak.token
-
 const getUsername = () => keycloak.tokenParsed?.preferred_username
 
 export { keycloak, initKeycloak, logout, getToken, getUsername }
