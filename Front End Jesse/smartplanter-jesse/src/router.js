@@ -12,7 +12,7 @@ const routes = [
   { path: '/', component: Login },
   { path: '/dashboard', component: Dashboard, meta: { requiresAuth: true } },
   { path: '/notifications', component: Notifications, meta: { requiresAuth: true } },
-  { path: '/data', component: Data, meta: { requiresAuth: true } },
+  { path: '/data', component: Data, meta:    { requiresAuth: true } },
   { path: '/settings', component: Settings, meta: { requiresAuth: true, requiresRole: 'admin' } },
 ]
 
