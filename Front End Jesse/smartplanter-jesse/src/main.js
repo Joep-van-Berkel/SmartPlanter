@@ -1,19 +1,28 @@
 import { createApp } from 'vue'
 import App from './App.vue'
 import router from './router'
+import Keycloak from 'keycloak-js'
+import './assets/styles/theme.css'
 
-import './assets/styles/theme.css'   
+// Restore theme
+const savedColor = localStorage.getItem('primary-color')
+if (savedColor) document.documentElement.style.setProperty('--primary', savedColor)
+const savedTheme = localStorage.getItem('theme')
+if (savedTheme === 'dark') document.documentElement.classList.add('dark')
 
-createApp(App).use(router).mount('#app')
+// Keycloak config (instance aanmaken, geen redirect)
+const keycloak = new Keycloak({
+  url: 'https://141.148.237.73:8443/',
+  realm: 'smartplanter',
+  clientId: 'frontend'
+})
 
-// main.js
-const savedColor = localStorage.getItem('primary-color');
-if (savedColor) {
-  document.documentElement.style.setProperty('--primary', savedColor);
-}
-
-// eventueel ook theme herstellen
-const savedTheme = localStorage.getItem('theme');
-if (savedTheme === 'dark') {
-  document.documentElement.classList.add('dark');
-}
+// Alleen init om de instance beschikbaar te maken
+keycloak.init({ checkLoginIframe: false, enableLogging: true })
+  .then(() => {
+    const app = createApp(App)
+    app.config.globalProperties.$keycloak = keycloak
+    app.use(router)
+    app.mount('#app')
+  })
+  .catch(err => console.error('❌ Keycloak init failed', err))

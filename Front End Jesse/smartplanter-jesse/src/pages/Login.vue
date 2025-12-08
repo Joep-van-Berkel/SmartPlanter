@@ -4,20 +4,18 @@
     <div class="container">
         <i class="fa-solid fa-seedling"></i>
         <h1>SmartPlanter</h1>
-        <a href="http://localhost:8080/dashboard">Login</a>
+        <button @click="login">Login</button>
     </div>
   </div>
 </template>
 
 <script>
-
-
-
-
-
 export default {
   name: 'LoginPage',
-  components: {
+  methods: {
+    login() {
+      this.$keycloak.login() // start Keycloak login flow
+    }
   }
 }
 </script>
@@ -59,7 +57,7 @@ export default {
         user-select: none;
     }
 
-    .container a {
+    .container button {
         display: flex;
         text-decoration: none;
         width: 15rem;
@@ -73,6 +71,12 @@ export default {
         font-weight: 400;
         user-select: none;
         cursor: pointer;
+        transition: all 200ms ease;
+    }
+
+    .container button:hover {
+        background: var(--primary-dark);
+        color: var(--primary);
     }
 
     .container i {
