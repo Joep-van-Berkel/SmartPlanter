@@ -1,21 +1,21 @@
 <template>
-  <SidebarNavbar/>
-  <div class="page">
-    <div class="container">
-        <i class="fa-solid fa-seedling"></i>
-        <h1>SmartPlanter</h1>
-        <button>Login</button>
-    </div>
+  <div>
+    <h1>Login</h1>
+    <button @click="login">Login via Keycloak</button>
   </div>
 </template>
 
 <script>
+import { keycloak } from '../keycloak'
+
 export default {
-  name: 'LoginPage',
-  methods: {
+  setup() {
+    const login = () => keycloak.login()
+    return { login }
   }
 }
 </script>
+
 
 <style>
 
