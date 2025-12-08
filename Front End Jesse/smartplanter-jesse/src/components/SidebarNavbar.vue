@@ -2,12 +2,15 @@
 import { ref, onMounted } from 'vue'
 import { auth } from '../keycloak'
 
+// Reactieve waarden
 const username = ref('...')
 const email = ref('...')
 const userFirstLetter = ref('U')
 
+// Haal profiel op
 onMounted(async () => {
   const profile = await auth.profile()
+
   if (profile) {
     username.value = `${profile.firstName} ${profile.lastName}`
     email.value = profile.email
@@ -15,22 +18,87 @@ onMounted(async () => {
   }
 })
 
+// Logout
 function logout() {
   auth.logout()
 }
 </script>
 
+
 <template>
   <div class="sidebar">
-    ...
-    <button class="nav-item" @click="logout">
-      <i class="fa-solid fa-right-from-bracket"></i>
-      <span class="label">Loguit</span>
-    </button>
-    ...
+
+    <!-- ========== LOGO SECTION ========== -->
+    <div class="logo">
+      <i class="fa-solid fa-seedling"></i>
+      <h1 class="logo-text">SmartPlanter</h1>
+    </div>
+    
+    <!-- ========== NAVIGATIE ========== -->
+    <nav>
+      <ul>
+
+        <!-- Dashboard -->
+        <li>
+          <router-link to="/dashboard" class="nav-item">
+            <i class="fa-solid fa-border-all"></i>
+            <span class="label">Dashboard</span>
+          </router-link>
+        </li>
+
+        <!-- Meldingen -->
+        <li>
+          <router-link to="/notifications" class="nav-item">
+            <i class="fa-solid fa-bell"></i>
+            <span class="label">Meldingen</span>
+          </router-link>
+          <p class="notificationCount">20</p>
+        </li>
+
+        <!-- Data -->
+        <li>
+          <router-link to="/data" class="nav-item">
+            <i class="fa-solid fa-chart-column"></i>
+            <span class="label">Data</span>
+          </router-link>
+        </li>
+
+      </ul>
+
+      <ul>
+
+        <!-- Instellingen -->
+        <li>
+          <router-link to="/settings" class="nav-item">
+            <i class="fa-solid fa-gear"></i>
+            <span class="label">Instellingen</span>
+          </router-link>
+        </li>
+
+        <!-- Uitloggen -->
+        <li>
+          <button class="nav-item" @click="logout">
+            <i class="fa-solid fa-right-from-bracket"></i>
+            <span class="label">Loguit</span>
+          </button>
+        </li>
+
+      </ul>
+    </nav>
+
+    <!-- ========== PROFIEL SECTIE (ONDER) ========== -->
+    <div class="profile">
+      <div class="profilePicture">
+        <span>{{ userFirstLetter }}</span>
+      </div>
+      <div class="profileInfo">
+        <span class="username">{{ username }}</span>
+        <span class="usermail">{{ email }}</span>
+      </div>
+    </div>
+
   </div>
 </template>
-
 
 <style>
 /* ================= SIDEBAR BASIS ================= */

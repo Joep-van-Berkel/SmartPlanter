@@ -37,19 +37,19 @@ router.beforeEach(async (to, from, next) => {
   }
 
   // Redirect ingelogde gebruiker weg van login pagina
-  if (to.path === '/' && keycloak.authenticated) {
+  if (to.path === '/' && authState.authenticated) {
     return next('/dashboard')
   }
 
   // Auth check
-  if (to.meta.requiresAuth && !keycloak.authenticated) {
-    return keycloak.login({ redirectUri: window.location.origin + to.path })
+  if (to.meta.requiresAuth && !authState.authenticated) {
+    return keycloak.login({ redirectUri: window.location.origin + to.fullPath })
   }
 
   // Role check
-  if (to.meta.requiresRole && !keycloak.hasRealmRole(to.meta.requiresRole)) {
+  if (to.meta.requiresRole && (!authState.authenticated || !keycloak.hasRealmRole(to.meta.requiresRole))) {
     alert('⛔ Geen toegang – onvoldoende rechten.')
-    return next('/dashboard')
+    return next('/')
   }
 
   next()

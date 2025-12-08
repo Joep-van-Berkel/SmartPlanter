@@ -2,11 +2,16 @@
 import { ref, onMounted } from 'vue'
 import { auth } from '../keycloak'
 
+// Reactieve username
 const fullName = ref('...')
 
+// Haal profiel op
 onMounted(async () => {
   const profile = await auth.profile()
-  if (profile) fullName.value = `${profile.firstName} ${profile.lastName}`
+
+  if (profile) {
+    fullName.value = `${profile.firstName} ${profile.lastName}`
+  }
 })
 </script>
 

@@ -10,18 +10,23 @@ const app = createApp(App)
 // Globale Keycloak helpers
 app.config.globalProperties.$auth = auth
 
-// Mount app direct (toon login pagina als nodig)
-app.use(router).mount('#app')
+// Functie om app pas te mounten als Keycloak klaar is
+async function startApp() {
+  // Wacht tot bestaande sessie gecontroleerd is
+  await checkExistingSession()
 
-// Check bestaande sessie (silent login)
-checkExistingSession()
+  // Mount de app pas nu
+  app.use(router).mount('#app')
 
-// Theme instellingen
-const savedColor = localStorage.getItem('primary-color')
-if (savedColor) {
-  document.documentElement.style.setProperty('--primary', savedColor)
+  // Theme instellingen
+  const savedColor = localStorage.getItem('primary-color')
+  if (savedColor) {
+    document.documentElement.style.setProperty('--primary', savedColor)
+  }
+  const savedTheme = localStorage.getItem('theme')
+  if (savedTheme === 'dark') {
+    document.documentElement.classList.add('dark')
+  }
 }
-const savedTheme = localStorage.getItem('theme')
-if (savedTheme === 'dark') {
-  document.documentElement.classList.add('dark')
-}
+
+startApp()
