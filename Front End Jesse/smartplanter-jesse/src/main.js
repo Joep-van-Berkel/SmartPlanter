@@ -1,24 +1,20 @@
-import { createApp } from 'vue';
-import App from './App.vue';
-import router from './router';
-import { keycloak, auth } from './keycloak';
+import { createApp } from 'vue'
+import App from './App.vue'
+import router from './router'
+import { auth } from './keycloak'
 
-import './assets/styles/theme.css';
+import './assets/styles/theme.css'
 
-// Theme settings
-const savedColor = localStorage.getItem('primary-color');
-if (savedColor) document.documentElement.style.setProperty('--primary', savedColor);
+const app = createApp(App)
 
-const savedTheme = localStorage.getItem('theme');
-if (savedTheme === 'dark') document.documentElement.classList.add('dark');
+// 🎨 Theme laden
+const savedColor = localStorage.getItem('primary-color')
+if (savedColor) document.documentElement.style.setProperty('--primary', savedColor)
 
-const app = createApp(App);
+const savedTheme = localStorage.getItem('theme')
+if (savedTheme === 'dark') document.documentElement.classList.add('dark')
 
-// Make keycloak available globally
-app.config.globalProperties.$keycloak = keycloak;
-app.config.globalProperties.$auth = auth;
-app.config.globalProperties.$login = () => keycloak.login();
-app.config.globalProperties.$logout = () => keycloak.logout({ redirectUri: window.location.origin });
-app.config.globalProperties.$hasRole = (role) => keycloak.hasRealmRole(role);
-
-app.use(router).mount('#app');
+// 🌐 Keycloak initialiseren en dan pas mounten
+auth.init().finally(() => {
+  app.use(router).mount('#app')
+})

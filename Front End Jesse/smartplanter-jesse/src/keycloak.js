@@ -1,57 +1,51 @@
 // src/keycloak.js
-import Keycloak from 'keycloak-js';
-import { reactive } from 'vue';
+import Keycloak from 'keycloak-js'
 
-const keycloakConfig = {
+const keycloak = new Keycloak({
   url: 'https://141.148.237.73:8443/',
   realm: 'smartplanter',
   clientId: 'frontend-jesse',
-};
+})
 
-export const keycloak = new Keycloak(keycloakConfig);
+export const auth = {
+  state: {
+    initialized: false,
+    authenticated: false,
+    profile: null,
+  },
 
-export const auth = reactive({
-  initializing: true,
-  authenticated: false,
-  error: null,
-  profile: null,
-});
+  init() {
+    return keycloak.init({
+      onLoad: 'check-sso', // check of er een bestaande sessie is
+      silentCheckSsoRedirectUri: window.location.origin + '/silent-check-sso.html',
+      pkceMethod: 'S256',
+    }).then((authenticated) => {
+      this.state.initialized = true
+      this.state.authenticated = authenticated
+      if (authenticated) {
+        return keycloak.loadUserProfile().then(profile => {
+          this.state.profile = profile
+          return profile
+        })
+      }
+    }).catch(err => console.error('Keycloak init failed', err))
+  },
 
-// Init Keycloak
-keycloak
-  .init({
-    onLoad: 'check-sso',              // check session without redirect
-    silentCheckSsoRedirectUri: window.location.origin + '/silent-check-sso.html',
-    pkceMethod: 'S256',
-  })
-  .then(async (authenticated) => {
-    auth.authenticated = authenticated;
-    if (authenticated) {
-      auth.profile = await keycloak.loadUserProfile();
-    }
-  })
-  .catch((err) => {
-    console.error('Keycloak init failed', err);
-    auth.error = err?.message || String(err);
-  })
-  .finally(() => {
-    auth.initializing = false;
-  });
+  login() {
+    keycloak.login()
+  },
 
-// Helper functions
-export function login() {
-  keycloak.login();
+  logout() {
+    keycloak.logout({ redirectUri: window.location.origin })
+  },
+
+  token() {
+    return keycloak.token
+  },
+
+  hasRole(role) {
+    return keycloak.hasRealmRole(role)
+  },
 }
 
-export function logout() {
-  keycloak.logout({ redirectUri: window.location.origin });
-}
-
-export function hasRole(role) {
-  if (!keycloak.authenticated) return false;
-  return keycloak.hasRealmRole(role);
-}
-
-export function token() {
-  return keycloak.token;
-}
+export { keycloak }

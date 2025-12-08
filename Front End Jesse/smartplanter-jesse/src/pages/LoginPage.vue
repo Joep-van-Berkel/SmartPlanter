@@ -8,16 +8,17 @@
 </template>
 
 <script>
-import { keycloak } from '../keycloak'
+import { auth } from '../keycloak'
 
 export default {
-  name: 'LoginPage', 
+  name: 'LoginPage',
   setup() {
-    const login = () => keycloak.login()
+    const login = () => auth.login()
     return { login }
   }
 }
 </script>
+
 
 <style>
 * {

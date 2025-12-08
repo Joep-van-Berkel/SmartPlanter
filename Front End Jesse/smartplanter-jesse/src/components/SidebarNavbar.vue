@@ -1,10 +1,23 @@
 <script setup>
-import { auth, logout } from '../keycloak';
-import { computed } from 'vue';
+import { ref, onMounted } from 'vue'
+import { auth } from '../keycloak'
 
-const username = computed(() => auth.profile ? `${auth.profile.firstName} ${auth.profile.lastName}` : '...');
-const email = computed(() => auth.profile?.email ?? '...');
-const userFirstLetter = computed(() => auth.profile?.firstName?.charAt(0) ?? 'U');
+const username = ref('...')
+const email = ref('...')
+const userFirstLetter = ref('U')
+
+onMounted(() => {
+  const profile = auth.state.profile
+  if (profile) {
+    username.value = `${profile.firstName} ${profile.lastName}`
+    email.value = profile.email
+    userFirstLetter.value = profile.firstName?.charAt(0) ?? 'U'
+  }
+})
+
+function logout() {
+  auth.logout()
+}
 </script>
 
 
