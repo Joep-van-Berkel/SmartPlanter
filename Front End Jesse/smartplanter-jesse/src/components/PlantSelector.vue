@@ -51,13 +51,16 @@ function select(option) {
   width: 200px;
   right: 0;
   top: 0;
+  z-index: 999;
 }
 
 .dropdown-btn {
   width: 100%;
   padding: 8px;
   cursor: pointer;
-  background: var(--light);
+  font-weight: 600;
+  font-size: 1rem;
+  background: var(--primary);
   border: 1px solid var(--light);
   color: var(--text);
   border-radius: 15px;

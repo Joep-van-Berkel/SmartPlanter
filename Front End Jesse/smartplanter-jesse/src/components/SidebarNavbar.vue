@@ -66,7 +66,7 @@ onMounted(() => {
 
         <!-- Uitloggen -->
         <li>
-          <a href="#" class="nav-item">
+          <a href="http://localhost:8080/" class="nav-item">
             <i class="fa-solid fa-right-from-bracket"></i>
             <span class="label">Loguit</span>
           </a>
