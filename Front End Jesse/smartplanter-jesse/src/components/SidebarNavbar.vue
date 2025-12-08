@@ -150,9 +150,12 @@ const logout = () => {
   font-size: 30px;
   font-weight: 500;
   color: var(--text);
+  background: none;
+  border: none;
   text-decoration: none;
   margin-left: 1rem;
   transition: all 0.3s ease;
+  cursor: pointer;
 }
 
 .nav-item i {
