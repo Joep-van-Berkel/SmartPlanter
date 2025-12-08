@@ -1,41 +1,32 @@
 <script setup>
-import { ref, onMounted } from 'vue'
-import { auth } from '../keycloak'
+import { ref } from 'vue'
+import { useRouter } from 'vue-router'
 
-const username = ref('...')
-const email = ref('...')
-const userFirstLetter = ref('U')
+// Reactieve placeholders
+const username = ref('Gebruiker Naam')
+const email = ref('email@voorbeeld.com')
+const userFirstLetter = ref('G')
 
-onMounted(() => {
-  const profile = auth.state.profile
-  if (profile) {
-    username.value = `${profile.firstName} ${profile.lastName}`
-    email.value = profile.email
-    userFirstLetter.value = profile.firstName?.charAt(0) ?? 'U'
-  }
-})
+const router = useRouter()
 
 function logout() {
-  auth.logout()
+  // Simpele frontend logout: navigeer naar login
+  router.push('/')
 }
 </script>
-
-
 
 <template>
   <div class="sidebar">
 
-    <!-- ========== LOGO SECTION ========== -->
+    <!-- LOGO -->
     <div class="logo">
       <i class="fa-solid fa-seedling"></i>
       <h1 class="logo-text">SmartPlanter</h1>
     </div>
     
-    <!-- ========== NAVIGATIE ========== -->
+    <!-- NAVIGATIE -->
     <nav>
       <ul>
-
-        <!-- Dashboard -->
         <li>
           <router-link to="/dashboard" class="nav-item">
             <i class="fa-solid fa-border-all"></i>
@@ -43,7 +34,6 @@ function logout() {
           </router-link>
         </li>
 
-        <!-- Meldingen -->
         <li>
           <router-link to="/notifications" class="nav-item">
             <i class="fa-solid fa-bell"></i>
@@ -52,19 +42,15 @@ function logout() {
           <p class="notificationCount">20</p>
         </li>
 
-        <!-- Data -->
         <li>
           <router-link to="/data" class="nav-item">
             <i class="fa-solid fa-chart-column"></i>
             <span class="label">Data</span>
           </router-link>
         </li>
-
       </ul>
 
       <ul>
-
-        <!-- Instellingen -->
         <li>
           <router-link to="/settings" class="nav-item">
             <i class="fa-solid fa-gear"></i>
@@ -72,18 +58,16 @@ function logout() {
           </router-link>
         </li>
 
-        <!-- Uitloggen -->
         <li>
           <button class="nav-item" @click="logout">
             <i class="fa-solid fa-right-from-bracket"></i>
             <span class="label">Loguit</span>
           </button>
         </li>
-
       </ul>
     </nav>
 
-    <!-- ========== PROFIEL SECTIE (ONDER) ========== -->
+    <!-- PROFIEL -->
     <div class="profile">
       <div class="profilePicture">
         <span>{{ userFirstLetter }}</span>

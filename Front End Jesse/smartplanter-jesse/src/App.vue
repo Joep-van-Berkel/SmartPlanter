@@ -1,14 +1,6 @@
 <template>
   <div id="app">
-    <!-- Loading indicator voor Keycloak init of sessie check -->
-    <div v-if="$auth.state.initializing" class="loading">
-      🔄 Loading...
-    </div>
-
-    <!-- Content van router -->
-    <div v-else>
-      <router-view />
-    </div>
+    <router-view />
   </div>
 </template>
 
@@ -50,13 +42,5 @@ body {
 }
 ::-webkit-scrollbar-thumb:hover {
   background: var(--primary);
-}
-
-.loading {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
-  font-size: 1.5rem;
 }
 </style>

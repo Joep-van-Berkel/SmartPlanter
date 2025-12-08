@@ -1,10 +1,9 @@
 <script setup>
-import { auth } from '../keycloak';
-import { computed } from 'vue';
+import { ref } from 'vue'
 
-const fullName = computed(() => auth.profile ? `${auth.profile.firstName} ${auth.profile.lastName}` : '...');
+// Placeholder naam, kan later dynamisch worden aangepast
+const fullName = ref('Gebruiker Naam')
 </script>
-
 
 <template>
   <div class="welcomeMessage">
