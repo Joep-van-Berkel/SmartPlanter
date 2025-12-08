@@ -1,18 +1,28 @@
 <script setup>
 import { ref, onMounted } from 'vue'
+import { auth } from '../keycloak'   // ⬅️ Keycloak auth import
+
+// Profiel data
+const username = ref('...')
+const email = ref('...')
 const userFirstLetter = ref('')
 
-// Wanneer de DOM gemount is, pak de username en zet alleen de eerste letter
-onMounted(() => {
-  const usernameEl = document.querySelector('.username')
-  if (usernameEl && usernameEl.textContent) {
-    userFirstLetter.value = usernameEl.textContent.trim().charAt(0)
+// Wanneer component mount → laad Keycloak profiel
+onMounted(async () => {
+  const profile = await auth.profile()
+
+  if (profile) {
+    username.value = profile.firstName + ' ' + profile.lastName
+    email.value = profile.email
+    userFirstLetter.value = profile.firstName?.charAt(0) ?? 'U'
   }
 })
 
+// Logout functie
+function logout() {
+  auth.logout()
+}
 </script>
-
-
 
 <template>
   <div class="sidebar">
@@ -66,7 +76,7 @@ onMounted(() => {
 
         <!-- Uitloggen -->
         <li>
-          <button class="nav-item">
+          <button class="nav-item" @click="logout">
             <i class="fa-solid fa-right-from-bracket"></i>
             <span class="label">Loguit</span>
           </button>
@@ -81,8 +91,8 @@ onMounted(() => {
         <span>{{ userFirstLetter }}</span>
       </div>
       <div class="profileInfo">
-        <span class="username">Jesse de Poot</span> <!-- Wordt uit DB gevuld -->
-        <span class="usermail">jessedepoot@hotmail.com</span>
+        <span class="username">{{ username }}</span>
+        <span class="usermail">{{ email }}</span>
       </div>
     </div>
 

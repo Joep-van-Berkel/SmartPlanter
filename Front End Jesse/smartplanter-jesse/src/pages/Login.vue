@@ -2,7 +2,7 @@
   <div class="page">
     <div class="container">
       <h1>Login</h1>
-      <button @click="login">Login via Keycloak</button>
+      <button @click="login">Inloggen</button>
     </div>
   </div>
 </template>
