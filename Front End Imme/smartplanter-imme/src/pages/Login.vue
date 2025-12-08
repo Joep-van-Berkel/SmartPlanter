@@ -9,7 +9,7 @@
     </div>
 
     <div class="centerKnop">
-      <button class="loginKnop">Login</button>
+      <button class="loginKnop" @click="login">Login</button>
     </div>
   </section>
 </template>
@@ -17,6 +17,13 @@
 <script>
 export default {
   name: "LoginPagina",
+  methods: {
+    login() {
+      this.$keycloak.login({
+        redirectUri: window.location.origin + "/home"
+      })
+    }
+  }
 };
 </script>
 

@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "keycloak-js": "^26.2.1",
     "vue-router": "^3.6.5"
   }
 }
