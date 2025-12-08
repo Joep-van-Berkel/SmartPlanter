@@ -4,7 +4,7 @@
     <div class="container">
         <i class="fa-solid fa-seedling"></i>
         <h1>SmartPlanter</h1>
-        <button @click="login">Login</button>
+        <button>Login</button>
     </div>
   </div>
 </template>
@@ -13,9 +13,6 @@
 export default {
   name: 'LoginPage',
   methods: {
-    login() {
-      this.$keycloak.login() // start Keycloak login flow
-    }
   }
 }
 </script>

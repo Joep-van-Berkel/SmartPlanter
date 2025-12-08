@@ -1,9 +1,6 @@
 <script setup>
 import { ref, onMounted } from 'vue'
-import { useRouter } from 'vue-router' // als je Vue Router gebruikt
-
 const userFirstLetter = ref('')
-const router = useRouter() // voor navigatie na logout
 
 // Wanneer de DOM gemount is, pak de username en zet alleen de eerste letter
 onMounted(() => {
@@ -13,15 +10,6 @@ onMounted(() => {
   }
 })
 
-// Logout functie
-const logout = () => {
-  // 1. Verwijder eventueel opgeslagen tokens
-  localStorage.removeItem('authToken') // pas aan naar jouw token key
-  sessionStorage.removeItem('authToken')
-
-  // 2. Redirect naar loginpagina
-  router.push('/')
-}
 </script>
 
 
@@ -78,7 +66,7 @@ const logout = () => {
 
         <!-- Uitloggen -->
         <li>
-          <button @click="logout" class="nav-item">
+          <button class="nav-item">
             <i class="fa-solid fa-right-from-bracket"></i>
             <span class="label">Loguit</span>
           </button>
