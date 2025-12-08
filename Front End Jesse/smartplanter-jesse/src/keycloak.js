@@ -14,11 +14,13 @@ export const auth = {
     profile: null,
   },
 
+  // Init Keycloak zonder automatische redirect
   init() {
     return keycloak.init({
-      onLoad: 'login-required', // 🔹 direct naar login als niet ingelogd
+      onLoad: 'check-sso', // check of gebruiker al ingelogd is, geen redirect
       pkceMethod: 'S256',
-    }).then((authenticated) => {
+    })
+    .then(authenticated => {
       this.state.initialized = true
       this.state.authenticated = authenticated
       if (authenticated) {
@@ -27,7 +29,8 @@ export const auth = {
           return profile
         })
       }
-    }).catch(err => console.error('Keycloak init failed', err))
+    })
+    .catch(err => console.error('Keycloak init failed', err))
   },
 
   login() {

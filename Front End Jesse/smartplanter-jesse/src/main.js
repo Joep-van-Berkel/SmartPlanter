@@ -14,7 +14,7 @@ if (savedColor) document.documentElement.style.setProperty('--primary', savedCol
 const savedTheme = localStorage.getItem('theme')
 if (savedTheme === 'dark') document.documentElement.classList.add('dark')
 
-// 🌐 Keycloak initialiseren en dan pas mounten
+// 🌐 Init Keycloak eerst, maar redirect pas bij beveiligde route
 auth.init().finally(() => {
   app.use(router).mount('#app')
 })
