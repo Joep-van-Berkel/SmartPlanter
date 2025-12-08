@@ -5,24 +5,29 @@ import { auth, checkExistingSession } from './keycloak'
 
 import './assets/styles/theme.css'
 
-const app = createApp(App)
+async function bootstrap() {
+  // Eerst Keycloak sessie checken
+  await checkExistingSession()
 
-// Globale Keycloak helpers
-app.config.globalProperties.$auth = auth
-app.config.globalProperties.$keycloak = auth // of keycloak
+  // Dan pas de app starten
+  const app = createApp(App)
 
-// Mount direct, app toont eerst je eigen loginpagina
-app.use(router).mount('#app')
+  // Globale auth
+  app.config.globalProperties.$auth = auth
+  app.config.globalProperties.$keycloak = auth
 
-// Optioneel: check bestaande sessie zonder redirect
-checkExistingSession()
+  app.use(router)
+  app.mount('#app')
 
-// Theme instellingen
-const savedColor = localStorage.getItem('primary-color')
-if (savedColor) {
-  document.documentElement.style.setProperty('--primary', savedColor)
+  // Theme instellingen
+  const savedColor = localStorage.getItem('primary-color')
+  if (savedColor) {
+    document.documentElement.style.setProperty('--primary', savedColor)
+  }
+  const savedTheme = localStorage.getItem('theme')
+  if (savedTheme === 'dark') {
+    document.documentElement.classList.add('dark')
+  }
 }
-const savedTheme = localStorage.getItem('theme')
-if (savedTheme === 'dark') {
-  document.documentElement.classList.add('dark')
-}
+
+bootstrap()
