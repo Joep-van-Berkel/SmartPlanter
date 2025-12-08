@@ -16,8 +16,7 @@ export const auth = {
 
   init() {
     return keycloak.init({
-      onLoad: 'check-sso', // check of er een bestaande sessie is
-      silentCheckSsoRedirectUri: window.location.origin + '/silent-check-sso.html',
+      onLoad: 'login-required', // 🔹 direct naar login als niet ingelogd
       pkceMethod: 'S256',
     }).then((authenticated) => {
       this.state.initialized = true
