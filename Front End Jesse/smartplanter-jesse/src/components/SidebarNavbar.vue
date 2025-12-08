@@ -1,17 +1,29 @@
 <script setup>
 import { ref, onMounted } from 'vue'
+import { useRouter } from 'vue-router' // als je Vue Router gebruikt
 
 const userFirstLetter = ref('')
+const router = useRouter() // voor navigatie na logout
 
 // Wanneer de DOM gemount is, pak de username en zet alleen de eerste letter
 onMounted(() => {
   const usernameEl = document.querySelector('.username')
   if (usernameEl && usernameEl.textContent) {
-    // Pak alleen de eerste letter van de volledige string
     userFirstLetter.value = usernameEl.textContent.trim().charAt(0)
   }
 })
+
+// Logout functie
+const logout = () => {
+  // 1. Verwijder eventueel opgeslagen tokens
+  localStorage.removeItem('authToken') // pas aan naar jouw token key
+  sessionStorage.removeItem('authToken')
+
+  // 2. Redirect naar loginpagina
+  router.push('/')
+}
 </script>
+
 
 
 <template>
@@ -66,10 +78,10 @@ onMounted(() => {
 
         <!-- Uitloggen -->
         <li>
-          <a href="http://localhost:8080/" class="nav-item">
+          <button @click="logout" class="nav-item">
             <i class="fa-solid fa-right-from-bracket"></i>
             <span class="label">Loguit</span>
-          </a>
+          </button>
         </li>
 
       </ul>
@@ -138,9 +150,12 @@ onMounted(() => {
   font-size: 30px;
   font-weight: 500;
   color: var(--text);
+  background: none;
+  border: none;
   text-decoration: none;
   margin-left: 1rem;
   transition: all 0.3s ease;
+  cursor: pointer;
 }
 
 .nav-item i {
