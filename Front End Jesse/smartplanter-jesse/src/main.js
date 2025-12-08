@@ -1,12 +1,17 @@
 import { createApp } from 'vue'
 import App from './App.vue'
 import router from './router'
-import { initKeycloak } from './keycloak'
+import { initKeycloak, auth, keycloak } from './keycloak'
 
 import './assets/styles/theme.css'
 
 const app = createApp(App)
 
+// Maak Keycloak helpers beschikbaar in alle components
+app.config.globalProperties.$keycloak = keycloak
+app.config.globalProperties.$auth = auth
+
+// Init Keycloak en mount App als klaar
 initKeycloak(() => {
   app.use(router).mount('#app')
 })
