@@ -6,9 +6,9 @@ import Keycloak from 'keycloak-js'
 
 // 1. Configuratie
 const initOptions = {
-  url: 'https://JOUW-KEYCLOAK-URL-HIER/',
-  realm: 'myrealm',
-  clientId: 'myvue',
+  url: 'https://141.148.237.73:8443/',
+  realm: 'smartplanter',
+  clientId: 'frontend-jesse',
   onLoad: 'login-required' 
 }
 
