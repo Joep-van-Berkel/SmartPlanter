@@ -13,7 +13,7 @@ export const keycloak = new Keycloak(initOptions)
 
 // --- Globale reactive auth state ---
 export const authState = reactive({
-  initializing: false, // false: init pas bij login of check-sso
+  initializing: true, // true totdat Keycloak klaar is
   authenticated: false,
   error: null,
   userProfile: null,
@@ -27,7 +27,7 @@ export const auth = {
     authState.initializing = true
     try {
       await keycloak.init({
-        onLoad: 'login-required', // start login flow
+        onLoad: 'login-required',
         pkceMethod: 'S256',
         redirectUri,
       })
@@ -47,8 +47,6 @@ export const auth = {
     authState.userProfile = null
   },
 
-  token: () => keycloak.token,
-
   profile: async () => {
     if (!keycloak.authenticated) return null
     if (!authState.userProfile) {
@@ -65,7 +63,7 @@ export async function checkExistingSession() {
   authState.initializing = true
   try {
     const authenticated = await keycloak.init({
-      onLoad: 'check-sso', // check sessie zonder redirect
+      onLoad: 'check-sso',
       silentCheckSsoRedirectUri: window.location.origin + '/silent-check-sso.html',
       pkceMethod: 'S256',
     })

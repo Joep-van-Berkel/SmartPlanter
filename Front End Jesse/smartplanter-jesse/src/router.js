@@ -22,7 +22,7 @@ const router = createRouter({
 })
 
 router.beforeEach(async (to, from, next) => {
-  // 1️⃣ Wacht Keycloak init af
+  // Wacht totdat Keycloak klaar is
   if (authState.initializing) {
     const stop = watch(
       () => authState.initializing,
@@ -36,30 +36,22 @@ router.beforeEach(async (to, from, next) => {
     return
   }
 
-  // 2️⃣ Redirect ingelogde gebruiker weg van login pagina
+  // Redirect ingelogde gebruiker weg van login pagina
   if (to.path === '/' && keycloak.authenticated) {
     return next('/dashboard')
   }
 
-  // 3️⃣ Routes die authenticatie vereisen
-  if (to.meta.requiresAuth) {
-    if (!keycloak.authenticated) {
-      // Gebruik alleen path, niet hele URL, voorkomt 431 error
-      return keycloak.login({
-        redirectUri: window.location.origin + to.path,
-      })
-    }
+  // Auth check
+  if (to.meta.requiresAuth && !keycloak.authenticated) {
+    return keycloak.login({ redirectUri: window.location.origin + to.path })
   }
 
-  // 4️⃣ Role check
-  if (to.meta.requiresRole) {
-    if (!keycloak.hasRealmRole(to.meta.requiresRole)) {
-      alert('⛔ Geen toegang – onvoldoende rechten.')
-      return next('/dashboard')
-    }
+  // Role check
+  if (to.meta.requiresRole && !keycloak.hasRealmRole(to.meta.requiresRole)) {
+    alert('⛔ Geen toegang – onvoldoende rechten.')
+    return next('/dashboard')
   }
 
-  // 5️⃣ Alles ok, ga door
   next()
 })
 
