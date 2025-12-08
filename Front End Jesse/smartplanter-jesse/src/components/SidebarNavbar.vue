@@ -1,28 +1,29 @@
 <script setup>
 import { ref, onMounted } from 'vue'
-import { auth } from '../keycloak'   // ⬅️ Keycloak auth import
+import { auth } from '../keycloak'
 
-// Profiel data
+// Reactieve waarden
 const username = ref('...')
 const email = ref('...')
-const userFirstLetter = ref('')
+const userFirstLetter = ref('U')
 
-// Wanneer component mount → laad Keycloak profiel
+// Haal profiel op
 onMounted(async () => {
   const profile = await auth.profile()
 
   if (profile) {
-    username.value = profile.firstName + ' ' + profile.lastName
+    username.value = `${profile.firstName} ${profile.lastName}`
     email.value = profile.email
     userFirstLetter.value = profile.firstName?.charAt(0) ?? 'U'
   }
 })
 
-// Logout functie
+// Logout
 function logout() {
   auth.logout()
 }
 </script>
+
 
 <template>
   <div class="sidebar">
