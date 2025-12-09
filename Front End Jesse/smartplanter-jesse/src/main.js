@@ -42,12 +42,12 @@ async function initKeycloak() {
   }
 
   try {
-    // ✅ PKCE toevoegen
     const authenticated = await keycloak.init({
       onLoad: 'login-required',
       checkLoginIframe: false,
       enableLogging: true,
-      pkceMethod: 'S256', // verplicht voor moderne SPA clients
+      pkceMethod: 'S256',        // PKCE verplicht voor moderne SPA clients
+      responseMode: 'query',      // voorkomt Invalid nonce errors
     })
 
     console.log('Keycloak init successful')
@@ -61,6 +61,17 @@ async function initKeycloak() {
 
     console.log('Gebruikersnaam:', keycloak.tokenParsed?.preferred_username)
     console.log('Roles:', keycloak.realmAccess?.roles)
+
+    // --- Token auto-refresh (elke 60 seconden) ---
+    setInterval(() => {
+      keycloak.updateToken(30).then(refreshed => {
+        if (refreshed) {
+          console.log('Token vernieuwd')
+        }
+      }).catch(err => {
+        console.warn('Token refresh failed', err)
+      })
+    }, 60000) // 60 sec
 
     // --- ROUTES ---
     const routes = [
