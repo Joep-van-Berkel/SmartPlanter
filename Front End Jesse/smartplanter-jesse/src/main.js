@@ -10,7 +10,7 @@ import './assets/styles/theme.css'
 
 // --- Keycloak Configuratie ---
 const keycloak = new Keycloak({
-  url: 'https://141.148.237.73:8443/', 
+  url: 'https://141.148.237.73:8443/auth/', 
   realm: 'smartplanter',
   clientId: 'frontend-jesse',
 })
