@@ -10,7 +10,7 @@ import './assets/styles/theme.css'
 
 // --- Keycloak Configuratie ---
 const keycloak = new Keycloak({
-  url: 'https://141.148.237.73:8443', // Let op: geen /auth
+  url: 'https://141.148.237.73:8443', // jouw Keycloak server root
   realm: 'smartplanter',
   clientId: 'frontend-jesse',
 })
@@ -42,10 +42,12 @@ async function initKeycloak() {
   }
 
   try {
+    // ✅ PKCE toevoegen
     const authenticated = await keycloak.init({
       onLoad: 'login-required',
       checkLoginIframe: false,
-      enableLogging: true
+      enableLogging: true,
+      pkceMethod: 'S256', // verplicht voor moderne SPA clients
     })
 
     console.log('Keycloak init successful')
