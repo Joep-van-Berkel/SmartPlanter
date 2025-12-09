@@ -1,44 +1,69 @@
 import { createApp } from 'vue'
-import { createRouter, createWebHistory } from 'vue-router' // 1. Importeer router
 import App from './App.vue'
-import DashboardPage from './pages/DashboardPage.vue'
-import DataPage from './pages/DataPage.vue' 
-import NotificationsPage from './pages/NotificationsPage.vue'
-import SettingsPage from './pages/SettingsPage.vue'
 import Keycloak from 'keycloak-js'
-import './assets/styles/theme.css';
+import DashboardPage from './pages/DashboardPage.vue'
+import SettingsPage from './pages/SettingsPage.vue'
+
+const vuetify = createVuetify({
+  components,
+  directives,
+})
+
 
 const initOptions = {
-  url: 'https://141.148.237.73:8443/', 
-  //url: 'https://aaad02.avans.nl:8443/', 
+  url: 'https://141.148.237.73:8443/',
   realm: 'smartplanter',
   clientId: 'frontend-jesse',
-  onLoad: 'login-required',
-  pkceMethod: 'S256'
+  onLoad: 'login-required'
 }
 
 const keycloak = new Keycloak(initOptions)
 
+// 2. Initialiseer Keycloak
 keycloak.init({ onLoad: initOptions.onLoad })
   .then((auth) => {
     if (!auth) {
       window.location.reload();
     } else {
+      console.log("Authenticated");
+
+      const app = createApp(App)
       
-      // --- ROUTER CONFIGURATIE ---
+      // 3. Maak Keycloak beschikbaar in de hele app (via $keycloak)
+      app.config.globalProperties.$keycloak = keycloak
+      
+      app.mount('#app')
+    }
+
+    // Token Refresh Logica
+    setInterval(() => {
+      keycloak.updateToken(70).then((refreshed) => {
+        if (refreshed) {
+          console.log('Token refreshed ' + refreshed);
+        }
+      }).catch(() => {
+        console.error('Failed to refresh token');
+      });
+    }, 60000)
+
+  })
+  .catch(() => {
+    console.error("Authenticated Failed");
+  });
+
+  // --- ROUTER CONFIGURATIE ---
       
       const routes = [
         { path: '/', component: DashboardPage },
-        { path: '/data', component: DataPage },
-        { path: '/notifications', component: NotificationsPage },
-        { path: '/settings', component: SettingsPage},
-      ]
-
-      const router = createRouter({
+        { 
+          path: '/setting', 
+          component: SettingsPage,
+          meta: { requiresRole: 'admin' } 
+        }
+    ]
         history: createWebHistory(),
-        routes,
-      })
-
+        routes
+      
       // 3. Navigation Guard (De Bewaker)
       router.beforeEach((to, from, next) => {
         if (to.meta.requiresRole) {
@@ -65,9 +90,7 @@ keycloak.init({ onLoad: initOptions.onLoad })
       app.use(router) // 4. Gebruik de router
       app.config.globalProperties.$keycloak = keycloak
       app.mount('#app')
-    }
-  })
-  .catch((error) => {
-    console.error(error);
+    
+  .catch(() => {
     console.error("Authentication Failed");
   });
