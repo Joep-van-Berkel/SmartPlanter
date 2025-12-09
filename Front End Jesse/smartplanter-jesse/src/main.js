@@ -1,70 +1,74 @@
 import { createApp } from 'vue'
-import { createRouter, createWebHistory } from 'vue-router'
+import { createRouter, createWebHistory } from 'vue-router' // 1. Importeer router
 import App from './App.vue'
 import DashboardPage from './pages/DashboardPage.vue'
 import DataPage from './pages/DataPage.vue' 
 import NotificationsPage from './pages/NotificationsPage.vue'
 import SettingsPage from './pages/SettingsPage.vue'
 import Keycloak from 'keycloak-js'
-import './assets/styles/theme.css'
+import './assets/styles/theme.css';
 
-// --- Keycloak Configuratie ---
-const keycloak = new Keycloak({
+const initOptions = {
   url: 'https://141.148.237.73:8443/', 
   realm: 'smartplanter',
   clientId: 'frontend-jesse',
-})
+  onLoad: 'login-required'
+}
 
-keycloak.init({
-  onLoad: 'login-required',
-  checkLoginIframe: false  // voorkomt iframe issues bij sommige browsers
-}).then(authenticated => {
-  if (!authenticated) {
-    console.warn('Niet ingelogd! Herlaad de pagina...')
-    window.location.reload()
-  } else {
-    console.log('Succesvol ingelogd!')
-    console.log('Gebruikersnaam:', keycloak.tokenParsed?.preferred_username)
-    console.log('Roles:', keycloak.realmAccess?.roles)
+const keycloak = new Keycloak(initOptions)
 
-    // --- ROUTES ---
-    const routes = [
-      { path: '/', component: DashboardPage },
-      { path: '/data', component: DataPage },
-      { path: '/notifications', component: NotificationsPage },
-      { 
-        path: '/settings', 
-        component: SettingsPage,
-        meta: { requiresRole: 'admin' } // Alleen admins
-      }
-    ]
-
-    const router = createRouter({
-      history: createWebHistory(),
-      routes
-    })
-
-    // --- NAVIGATION GUARD ---
-    router.beforeEach((to, from, next) => {
-      if (to.meta.requiresRole) {
-        const hasRole = keycloak.hasRealmRole(to.meta.requiresRole)
-        if (hasRole) {
-          next()
-        } else {
-          alert('⛔ Geen toegang! Je hebt geen admin rechten.')
-          next('/')
+keycloak.init({ onLoad: initOptions.onLoad })
+  .then((auth) => {
+    if (!auth) {
+      window.location.reload();
+    } else {
+      
+      // --- ROUTER CONFIGURATIE ---
+      
+      const routes = [
+        { path: '/', component: DashboardPage },
+        { path: '/data', component: DataPage },
+        { path: '/notifications', component: NotificationsPage },
+        { 
+          path: '/settings', 
+          component: SettingsPage,
+          meta: { requiresRole: 'admin' } // 2. Markeer deze route als beschermd
         }
-      } else {
-        next()
-      }
-    })
+      ]
 
-    // --- VUE APP ---
-    const app = createApp(App)
-    app.use(router)
-    app.config.globalProperties.$keycloak = keycloak
-    app.mount('#app')
-  }
-}).catch(err => {
-  console.error('Keycloak init failed', err)
-})
+      const router = createRouter({
+        history: createWebHistory(),
+        routes,
+      })
+
+      // 3. Navigation Guard (De Bewaker)
+      router.beforeEach((to, from, next) => {
+        if (to.meta.requiresRole) {
+          // Check of de gebruiker de rol heeft (Realm Role)
+          const hasRole = keycloak.hasRealmRole(to.meta.requiresRole);
+          
+          // Als je Client Roles gebruikt ipv Realm roles, gebruik dan:
+          // const hasRole = keycloak.hasResourceRole(to.meta.requiresRole, 'myvue');
+
+          if (hasRole) {
+            next(); // Mag doorlopen
+          } else {
+            alert('⛔ Geen toegang! Je hebt geen admin rechten.');
+            next('/'); // Stuur terug naar home
+          }
+        } else {
+          next(); // Publieke pagina's
+        }
+      })
+
+      // --- EINDE ROUTER CONFIGURATIE ---
+
+      const app = createApp(App)
+      app.use(router) // 4. Gebruik de router
+      app.config.globalProperties.$keycloak = keycloak
+      app.mount('#app')
+    }
+  })
+  .catch(() => {
+    console.error("Authentication Failed");
+  });
