@@ -8,24 +8,21 @@ import SettingsPage from './pages/SettingsPage.vue'
 import Keycloak from 'keycloak-js'
 import './assets/styles/theme.css';
 
-// Keycloak configuratie
-const initOptions = {
-  url: 'https://141.148.237.73:8443/', 
+const keycloak = new Keycloak({
+  url: 'https://141.148.237.73:8443/',
   realm: 'smartplanter',
   clientId: 'frontend-jesse',
-  pkceMethod: 'S256',
-  onLoad: 'login-required'
-};
+});
 
-const keycloak = new Keycloak(initOptions);
-
-// 🔥 BELANGRIJK: pkceMethod moet hier in init() staan
 keycloak.init({
-  onLoad: initOptions.onLoad,
-  pkceMethod: initOptions.pkceMethod
+  onLoad: 'login-required',
+  pkceMethod: 'S256',
+  checkLoginIframe: false,       // <- voorkomt reload loop
+  silentCheckSsoRedirectUri: window.location.origin + '/silent-check-sso.html'
 })
-.then((auth) => {
+.then(auth => {
   if (!auth) {
+    window.location.reload();    // <- correcte handling
     return;
   }
 
@@ -46,15 +43,12 @@ keycloak.init({
     routes,
   });
 
-  // Role protection
   router.beforeEach((to, from, next) => {
     if (to.meta.requiresRole) {
-      const hasRole = keycloak.hasRealmRole(to.meta.requiresRole);
-
-      if (hasRole) {
+      if (keycloak.hasRealmRole(to.meta.requiresRole)) {
         next();
       } else {
-        alert('⛔ Geen toegang! Je hebt geen admin rechten.');
+        alert("⛔ Geen toegang! Je hebt geen admin rechten.");
         next('/');
       }
     } else {
@@ -67,7 +61,6 @@ keycloak.init({
   app.config.globalProperties.$keycloak = keycloak;
   app.mount('#app');
 })
-.catch((error) => {
-  console.error(error);
-  console.error("Authentication Failed");
+.catch(err => {
+  console.error("Keycloak init failed:", err);
 });
