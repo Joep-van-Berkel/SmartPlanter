@@ -26,7 +26,6 @@ keycloak.init({
 })
 .then((auth) => {
   if (!auth) {
-    window.location.reload();
     return;
   }
 
