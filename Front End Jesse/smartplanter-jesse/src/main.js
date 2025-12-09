@@ -70,6 +70,7 @@ keycloak.init({ onLoad: initOptions.onLoad })
       app.mount('#app')
     }
   })
-  .catch(() => {
+  .catch((error) => {
+    console.error(error);
     console.error("Authentication Failed");
   });
