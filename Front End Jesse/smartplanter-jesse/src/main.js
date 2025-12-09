@@ -5,26 +5,31 @@ import router from './router';
 import keycloak from './keycloak';
 import './assets/styles/theme.css';
 
-function initVue() {
-  const app = createApp(App);
+// KEYCLOAK STATUS
+window.keycloakReady = false;
+window.keycloakInitError = false;
 
-  // Keycloak beschikbaar in alle components
-  app.config.globalProperties.$keycloak = keycloak;
+// Start Vue onmiddelijk
+const app = createApp(App);
+app.config.globalProperties.$keycloak = keycloak;
+app.use(router);
+app.mount('#app');
 
-  app.use(router);
-  app.mount('#app');
-}
-
+// Start Keycloak async
 keycloak.init({
-  onLoad: 'login-required', // verplicht inloggen
+  onLoad: 'login-required',
   pkceMethod: 'S256',
-}).then((authenticated) => {
-  if (authenticated) {
-    console.log("🔐 Keycloak login OK");
-    initVue();
-    // Na login ga je altijd naar dashboard
-  } else {
-    console.warn("❌ Niet ingelogd, redirect naar Keycloak");
-    keycloak.login();
+  checkLoginIframe: false,
+}).then(authenticated => {
+  if (!authenticated) {
+    return keycloak.login();
   }
+
+  console.log("🔐 Keycloak login OK");
+
+  window.keycloakReady = true;
+
+}).catch(err => {
+  console.error("❌ Keycloak init failed", err);
+  window.keycloakInitError = true;
 });
