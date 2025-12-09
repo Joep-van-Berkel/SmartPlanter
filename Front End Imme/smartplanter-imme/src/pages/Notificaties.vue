@@ -1,5 +1,4 @@
 <template>
-    <NavBar />
 <section>
   <h1>We zouden nu in de Meldingen pagina mogen zitten</h1>
 </section>
@@ -8,14 +7,9 @@
 
 
 <script>
-import NavBar from '../components/NavBar.vue'
-
-
 export default {
   name: 'MeldingenPagina',
-  components: {
-    NavBar
-  }
+  components: {}
 }
 </script>
 

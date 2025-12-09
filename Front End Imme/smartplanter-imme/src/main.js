@@ -13,18 +13,43 @@ const vuetify = createVuetify({
 })
 
 
-const keycloak = new Keycloak({
+const initOptions = {
   url: 'https://141.148.237.73:8443/',
   realm: 'smartplanter',
-  clientId: 'frontend'
-})
+  clientId: 'frontend-imme',
+  onLoad: 'login-required'
+}
 
+const keycloak = new Keycloak(initOptions)
 
-keycloak.init({ checkLoginIframe: false, enableLogging: true })
-  .then(() => {
-    const app = createApp(App)
-    app.config.globalProperties.$keycloak = keycloak
-    app.use(router)
-    app.mount('#app')
+// 2. Initialiseer Keycloak
+keycloak.init({ onLoad: initOptions.onLoad })
+  .then((auth) => {
+    if (!auth) {
+      window.location.reload();
+    } else {
+      console.log("Authenticated");
+
+      const app = createApp(App)
+      
+      // 3. Maak Keycloak beschikbaar in de hele app (via $keycloak)
+      app.config.globalProperties.$keycloak = keycloak
+      
+      app.mount('#app')
+    }
+
+    // Token Refresh Logica
+    setInterval(() => {
+      keycloak.updateToken(70).then((refreshed) => {
+        if (refreshed) {
+          console.log('Token refreshed ' + refreshed);
+        }
+      }).catch(() => {
+        console.error('Failed to refresh token');
+      });
+    }, 60000)
+
   })
-  .catch(err => console.error('❌ Keycloak init failed', err))
+  .catch(() => {
+    console.error("Authenticated Failed");
+  });

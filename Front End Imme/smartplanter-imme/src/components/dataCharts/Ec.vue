@@ -1,6 +1,8 @@
 <template>
 <div class="linechart">
-    <canvas ref="canvasEl"></canvas>
+    <canvas ref="canvasEl">
+      <p1>test</p1>
+    </canvas>
 </div>
 </template>
 
@@ -50,9 +52,11 @@ new Chart(canvasEl.value, {
 .linechart {
     background-color:  #2d6a4f28;
     border-radius: 15%;
-    width: 25rem;
-    height: 17rem;
-
+    width: 22rem;
+    height: 15rem;
+    
 } 
+
+
 
 </style>

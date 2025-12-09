@@ -1,6 +1,4 @@
-<template>
-  <NavBar />
-  <FooterBar />
+<template class="Account">
 
   <div class="accountknop">
     <button class="settingsknop">Account setting</button>
@@ -9,7 +7,7 @@
   <div class="MoestuinKeuze">
     <h1>U werkt nu in:</h1>
 
-    <div class="moestuinKeuzeDropDown">
+    <div class="moestuinKeuzeDropDown" ref="dropdown">
       <div class="dropdown-selected" @click="toggleDropdown">
         {{ gekozenMoestuin || '- -' }}
         <span class="dropDown">▼</span>
@@ -39,6 +37,7 @@
     />
     <button class="moestuinNaamButton" @click="bevestigNaam">OK</button>
   </div>
+
 </div>
 
 
@@ -46,12 +45,10 @@
 
 
 <script>
-import NavBar from '../components/NavBar.vue';
-import FooterBar from '../components/FooterBar.vue';
 
 export default {
   name: 'AccountPagina',
-  components: { NavBar },
+  components: { },
 
   data() {
     return {
@@ -75,17 +72,42 @@ export default {
     bevestigNaam() {
       console.log(this.moestuinNaam);
       this.moestuinNaam = "";
-    }
+    },
+
+     handleClickOutside(event) {
+      // Klik buiten de dropdown?
+      if (this.$refs.dropdown && !this.$refs.dropdown.contains(event.target)) {
+        this.open = false;
+      }
+    },
+  },
+
+  mounted() {
+    document.addEventListener("click", this.handleClickOutside);
+  },
+
+  beforeUnmount() {
+    document.removeEventListener("click", this.handleClickOutside);
   }
+  
 };
 </script>
 
 
 
 <style>
+
+.Account {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  padding: 1rem;
+  box-sizing: border-box;
+  position: relative;
+}
+
+
 .settingsknop {
-  margin-top: 2%;
-  margin-left: 2%;
   background-color: #2d6a4f;
   color: white;
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
@@ -96,6 +118,14 @@ export default {
   border-radius: 25px;
   cursor: pointer;
   transition: 0.2s ease;
+  align-self: flex-start;
+  margin-bottom: auto; /* duwt alles eronder naar beneden */
+
+}
+
+.settingsknop {
+  margin: 2%;
+  align-self: start;
 }
 
 .settingsknop:hover {
@@ -113,10 +143,15 @@ export default {
   flex-direction: column;
   align-items: flex-end;
   gap: 2px;
+  top: 1rem;
+  right: 1rem;
+  
 
   color: white;
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
 }
+
+  
 
 
 .MoestuinKeuze h1 {
@@ -175,15 +210,17 @@ export default {
 
 /*-----------------TEXTFIELD---------------*/
 .moestuinNaamContainer {
-  position: absolute;
-  left: 3rem;             
-  top: 45rem;          
+  margin-bottom: 2rem;
+  margin-left: 2%;        
   display: flex;
   flex-direction: column;
   gap: 6px;
   color: #2d6a4f;
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  
 }
+
+
 
 .moestuinNaamContainer input {
   width: 220px;
@@ -227,4 +264,4 @@ export default {
 
 
 
-</style>
+</style> 
