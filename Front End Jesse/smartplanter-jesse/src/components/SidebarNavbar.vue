@@ -1,45 +1,32 @@
 <script setup>
-import { ref, onMounted } from 'vue'
-import { useRouter } from 'vue-router' // als je Vue Router gebruikt
+import { ref } from 'vue'
+import { useRouter } from 'vue-router'
 
-const userFirstLetter = ref('')
-const router = useRouter() // voor navigatie na logout
+// Reactieve placeholders
+const username = ref('Gebruiker Naam')
+const email = ref('email@voorbeeld.com')
+const userFirstLetter = ref('G')
 
-// Wanneer de DOM gemount is, pak de username en zet alleen de eerste letter
-onMounted(() => {
-  const usernameEl = document.querySelector('.username')
-  if (usernameEl && usernameEl.textContent) {
-    userFirstLetter.value = usernameEl.textContent.trim().charAt(0)
-  }
-})
+const router = useRouter()
 
-// Logout functie
-const logout = () => {
-  // 1. Verwijder eventueel opgeslagen tokens
-  localStorage.removeItem('authToken') // pas aan naar jouw token key
-  sessionStorage.removeItem('authToken')
-
-  // 2. Redirect naar loginpagina
+function logout() {
+  // Simpele frontend logout: navigeer naar login
   router.push('/')
 }
 </script>
 
-
-
 <template>
   <div class="sidebar">
 
-    <!-- ========== LOGO SECTION ========== -->
+    <!-- LOGO -->
     <div class="logo">
       <i class="fa-solid fa-seedling"></i>
       <h1 class="logo-text">SmartPlanter</h1>
     </div>
     
-    <!-- ========== NAVIGATIE ========== -->
+    <!-- NAVIGATIE -->
     <nav>
       <ul>
-
-        <!-- Dashboard -->
         <li>
           <router-link to="/dashboard" class="nav-item">
             <i class="fa-solid fa-border-all"></i>
@@ -47,7 +34,6 @@ const logout = () => {
           </router-link>
         </li>
 
-        <!-- Meldingen -->
         <li>
           <router-link to="/notifications" class="nav-item">
             <i class="fa-solid fa-bell"></i>
@@ -56,19 +42,15 @@ const logout = () => {
           <p class="notificationCount">20</p>
         </li>
 
-        <!-- Data -->
         <li>
           <router-link to="/data" class="nav-item">
             <i class="fa-solid fa-chart-column"></i>
             <span class="label">Data</span>
           </router-link>
         </li>
-
       </ul>
 
       <ul>
-
-        <!-- Instellingen -->
         <li>
           <router-link to="/settings" class="nav-item">
             <i class="fa-solid fa-gear"></i>
@@ -76,25 +58,23 @@ const logout = () => {
           </router-link>
         </li>
 
-        <!-- Uitloggen -->
         <li>
-          <button @click="logout" class="nav-item">
+          <button class="nav-item" @click="logout">
             <i class="fa-solid fa-right-from-bracket"></i>
             <span class="label">Loguit</span>
           </button>
         </li>
-
       </ul>
     </nav>
 
-    <!-- ========== PROFIEL SECTIE (ONDER) ========== -->
+    <!-- PROFIEL -->
     <div class="profile">
       <div class="profilePicture">
         <span>{{ userFirstLetter }}</span>
       </div>
       <div class="profileInfo">
-        <span class="username">Jesse de Poot</span> <!-- Wordt uit DB gevuld -->
-        <span class="usermail">jessedepoot@hotmail.com</span>
+        <span class="username">{{ username }}</span>
+        <span class="usermail">{{ email }}</span>
       </div>
     </div>
 

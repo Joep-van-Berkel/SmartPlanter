@@ -1,48 +1,31 @@
-// main.js
-import { createApp } from 'vue'
-import App from './App.vue'
-import router from './router' // je router importeren
-import Keycloak from 'keycloak-js'
+// src/main.js
+import { createApp } from 'vue';
+import App from './App.vue';
+import router from './router';
+import keycloak from './keycloak';
+import './assets/styles/theme.css';
 
-// 1. Configuratie
-const initOptions = {
-  url: 'https://141.148.237.73:8443/',
-  realm: 'smartplanter',
-  clientId: 'frontend-jesse',
-  onLoad: 'login-required' 
+function initVue() {
+  const app = createApp(App);
+
+  // Keycloak beschikbaar in alle components
+  app.config.globalProperties.$keycloak = keycloak;
+
+  app.use(router);
+  app.mount('#app');
 }
 
-const keycloak = new Keycloak(initOptions)
-
-// 2. Initialiseer Keycloak
-keycloak.init({ onLoad: initOptions.onLoad }).then((auth) => {
-  if (!auth) {
-    window.location.reload();
+keycloak.init({
+  onLoad: 'login-required', // verplicht inloggen
+  pkceMethod: 'S256',
+}).then((authenticated) => {
+  if (authenticated) {
+    console.log("🔐 Keycloak login OK");
+    initVue();
+    // Na login ga je altijd naar dashboard
+    router.push('/dashboard');
   } else {
-    console.log("Authenticated");
-
-    const app = createApp(App)
-
-    // Keycloak beschikbaar maken in de app
-    app.config.globalProperties.$keycloak = keycloak
-
-    // 3. Voeg router toe **na authenticatie**
-    app.use(router)
-
-    app.mount('#app')
+    console.warn("❌ Niet ingelogd, redirect naar Keycloak");
+    keycloak.login();
   }
-
-  // Token Refresh
-  setInterval(() => {
-    keycloak.updateToken(70).then((refreshed) => {
-      if (refreshed) {
-        console.log('Token refreshed ' + refreshed);
-      }
-    }).catch(() => {
-      console.error('Failed to refresh token');
-    });
-  }, 60000)
-
-}).catch(() => {
-  console.error("Authentication Failed");
 });
