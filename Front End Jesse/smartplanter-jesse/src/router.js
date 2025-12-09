@@ -7,11 +7,12 @@ import Data from './pages/DataPage.vue';
 import Settings from './pages/SettingsPage.vue';
 
 const routes = [
-  { path: '/', redirect: '/dashboard' },   // ← Belangrijk
+  { path: '/', redirect: '/dashboard' },
   { path: '/dashboard', component: Dashboard },
   { path: '/notifications', component: Notifications },
   { path: '/data', component: Data },
   { path: '/settings', component: Settings },
+  { path: '/:pathMatch(.*)*', redirect: '/dashboard' } // fallback
 ];
 
 const router = createRouter({
@@ -19,10 +20,9 @@ const router = createRouter({
   routes,
 });
 
-// Wacht totdat Keycloak is ingelogd
+// Guard: wacht tot Keycloak klaar is
 router.beforeEach((to, from, next) => {
   if (!window.keycloakReady && !window.keycloakInitError) {
-    // wacht elke 50ms tot keycloak klaar is
     const wait = setInterval(() => {
       if (window.keycloakReady || window.keycloakInitError) {
         clearInterval(wait);
