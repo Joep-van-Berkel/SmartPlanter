@@ -31,11 +31,7 @@ keycloak.init({ onLoad: initOptions.onLoad })
         { path: '/', component: DashboardPage },
         { path: '/data', component: DataPage },
         { path: '/notifications', component: NotificationsPage },
-        { 
-          path: '/settings', 
-          component: SettingsPage,
-          meta: { requiresRole: 'admin' } // 2. Markeer deze route als beschermd
-        }
+        { path: '/settings', component: SettingsPage},
       ]
 
       const router = createRouter({
