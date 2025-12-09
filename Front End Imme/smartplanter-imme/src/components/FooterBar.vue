@@ -33,6 +33,10 @@ export default {
   color:white;
 }
 
+.footer {
+  box-shadow: 0 -4px 25px rgba(0,0,0,0.35);
+}
+
 .footerIcoon{
   height: 30px;
   text-decoration: none;
