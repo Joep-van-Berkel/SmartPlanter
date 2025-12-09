@@ -9,8 +9,8 @@ import Keycloak from 'keycloak-js'
 import './assets/styles/theme.css';
 
 const initOptions = {
-  //url: 'https://141.148.237.73:8443/', 
-  url: 'https://aaad02.avans.nl:8443/', 
+  url: 'https://141.148.237.73:8443/', 
+  //url: 'https://aaad02.avans.nl:8443/', 
   realm: 'smartplanter',
   clientId: 'frontend-jesse',
   onLoad: 'login-required',
