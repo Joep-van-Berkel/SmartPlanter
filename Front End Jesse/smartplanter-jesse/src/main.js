@@ -47,7 +47,10 @@ router.beforeEach((to, from, next) => {
 })
 
 // --- INITIALISEER KEYCLOAK ---
-keycloak.init({ onLoad: initOptions.onLoad })
+keycloak.init({ 
+  onLoad: initOptions.onLoad,
+  pkceMethod: 'S256'  // <-- Belangrijk voor public clients
+})
   .then((auth) => {
     if (!auth) return window.location.reload()
 
@@ -72,6 +75,6 @@ keycloak.init({ onLoad: initOptions.onLoad })
     }, 60000)
   })
   .catch((error) => {
-  console.error("Authentication Failed");
-  console.error(error);
-});
+    console.error("Authentication Failed");
+    console.error(error);
+  });
