@@ -49,10 +49,14 @@ router.beforeEach((to, from, next) => {
 // --- INITIALISEER KEYCLOAK ---
 keycloak.init({ 
   onLoad: initOptions.onLoad,
-  pkceMethod: 'S256'  // <-- Belangrijk voor public clients
+  pkceMethod: 'S256' // Voor public clients
 })
   .then((auth) => {
-    if (!auth) return window.location.reload()
+    if (!auth) {
+      console.warn("⚠️ Keycloak authentication failed or was canceled. Check client settings in Keycloak.")
+      console.log("Auth object:", auth)
+      return
+    }
 
     console.log("Authenticated")
 
@@ -70,11 +74,10 @@ keycloak.init({
         .then((refreshed) => {
           if (refreshed) console.log('🔄 Token refreshed')
         })
-        .catch(() => 
-          console.error('❌ Failed to refresh token'))
+        .catch(() => console.error('❌ Failed to refresh token'))
     }, 60000)
   })
   .catch((error) => {
     console.error("Authentication Failed");
     console.error(error);
-  });
+  })
