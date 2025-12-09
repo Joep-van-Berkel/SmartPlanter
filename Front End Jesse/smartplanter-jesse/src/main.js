@@ -10,13 +10,37 @@ import './assets/styles/theme.css'
 
 // --- Keycloak Configuratie ---
 const keycloak = new Keycloak({
-  url: 'https://141.148.237.73:8443', // Let op: geen /auth, want jouw server draait op root
+  url: 'https://141.148.237.73:8443', // Let op: geen /auth
   realm: 'smartplanter',
   clientId: 'frontend-jesse',
 })
 
+// --- Extra debug functie om OpenID config te checken ---
+async function checkRealmConfig() {
+  const url = `https://141.148.237.73:8443/realms/smartplanter/.well-known/openid-configuration`
+  try {
+    const res = await fetch(url)
+    if (!res.ok) {
+      console.error('Fout bij ophalen realm config:', res.status, res.statusText)
+      return false
+    }
+    const data = await res.json()
+    console.log('Realm config OK:', data)
+    return true
+  } catch (err) {
+    console.error('Kan realm config niet ophalen:', err)
+    return false
+  }
+}
+
 // --- Functie om Keycloak te initialiseren ---
 async function initKeycloak() {
+  const realmOk = await checkRealmConfig()
+  if (!realmOk) {
+    alert('Kon Keycloak realm config niet ophalen. Controleer URL, netwerk en SSL.')
+    return
+  }
+
   try {
     const authenticated = await keycloak.init({
       onLoad: 'login-required',
@@ -77,12 +101,9 @@ async function initKeycloak() {
 
   } catch (err) {
     console.error('Keycloak init failed:', err)
-    if (err && err.message) {
-      console.error('Error message:', err.message)
-    } else {
-      console.error('Full error object:', JSON.stringify(err))
-    }
-    alert('Keycloak init failed. Check console for network/CORS/SSL issues.')
+    if (err && err.message) console.error('Error message:', err.message)
+    else console.error('Full error object:', JSON.stringify(err))
+    alert('Keycloak init failed. Check console for details.')
   }
 }
 
