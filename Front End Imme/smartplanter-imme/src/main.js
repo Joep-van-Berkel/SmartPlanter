@@ -53,3 +53,47 @@ keycloak.init({ onLoad: initOptions.onLoad })
   .catch(() => {
     console.error("Authenticated Failed");
   });
+
+  // --- ROUTER CONFIGURATIE ---
+      
+      const routes = [
+        { path: '/', component: HomeView },
+        { 
+          path: '/admin', 
+          component: AdminView,
+          meta: { requiresRole: 'admin' } 
+        }
+    ]
+        history: createWebHistory(),
+        routes
+      
+      // 3. Navigation Guard (De Bewaker)
+      router.beforeEach((to, from, next) => {
+        if (to.meta.requiresRole) {
+          // Check of de gebruiker de rol heeft (Realm Role)
+          const hasRole = keycloak.hasRealmRole(to.meta.requiresRole);
+          
+          // Als je Client Roles gebruikt ipv Realm roles, gebruik dan:
+          // const hasRole = keycloak.hasResourceRole(to.meta.requiresRole, 'myvue');
+
+          if (hasRole) {
+            next(); // Mag doorlopen
+          } else {
+            alert('⛔ Geen toegang! Je hebt geen admin rechten.');
+            next('/'); // Stuur terug naar home
+          }
+        } else {
+          next(); // Publieke pagina's
+        }
+      })
+
+      // --- EINDE ROUTER CONFIGURATIE ---
+
+      const app = createApp(App)
+      app.use(router) // 4. Gebruik de router
+      app.config.globalProperties.$keycloak = keycloak
+      app.mount('#app')
+    
+  .catch(() => {
+    console.error("Authentication Failed");
+  });
