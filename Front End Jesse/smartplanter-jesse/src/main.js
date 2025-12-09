@@ -13,7 +13,8 @@ const initOptions = {
   //url: 'https://aaad02.avans.nl:8443/', 
   realm: 'smartplanter',
   clientId: 'frontend-jesse',
-  onLoad: 'login-required'
+  onLoad: 'login-required',
+  pkceMethod: 'S256'
 }
 
 const keycloak = new Keycloak(initOptions)
