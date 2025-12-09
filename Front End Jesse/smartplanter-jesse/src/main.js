@@ -10,79 +10,61 @@ import './assets/styles/theme.css'
 
 // --- Keycloak Configuratie ---
 const keycloak = new Keycloak({
-  url: 'https://141.148.237.73:8443',
+  url: 'https://141.148.237.73:8443/', 
   realm: 'smartplanter',
   clientId: 'frontend-jesse',
 })
 
-// --- Keycloak Init met extra logging ---
 keycloak.init({
   onLoad: 'login-required',
-  checkLoginIframe: false,  // voorkomt iframe issues bij sommige browsers
-  enableLogging: true
-})
-.then(authenticated => {
-  console.log('Keycloak init successful')
-  console.log('Authenticated:', authenticated)
-
+  checkLoginIframe: false  // voorkomt iframe issues bij sommige browsers
+}).then(authenticated => {
   if (!authenticated) {
     console.warn('Niet ingelogd! Herlaad de pagina...')
     window.location.reload()
-    return
-  }
-
-  console.log('Gebruikersnaam:', keycloak.tokenParsed?.preferred_username)
-  console.log('Roles:', keycloak.realmAccess?.roles)
-
-  // --- ROUTES ---
-  const routes = [
-    { path: '/', component: DashboardPage },
-    { path: '/data', component: DataPage },
-    { path: '/notifications', component: NotificationsPage },
-    { 
-      path: '/settings', 
-      component: SettingsPage,
-      meta: { requiresRole: 'admin' } // Alleen admins
-    }
-  ]
-
-  const router = createRouter({
-    history: createWebHistory(),
-    routes
-  })
-
-  // --- NAVIGATION GUARD ---
-  router.beforeEach((to, from, next) => {
-    if (to.meta.requiresRole) {
-      const hasRole = keycloak.hasRealmRole(to.meta.requiresRole)
-      console.log(`Checking role for route ${to.path}:`, hasRole)
-      if (hasRole) {
-        next()
-      } else {
-        alert('⛔ Geen toegang! Je hebt geen admin rechten.')
-        next('/')
-      }
-    } else {
-      next()
-    }
-  })
-
-  // --- VUE APP ---
-  const app = createApp(App)
-  app.use(router)
-  app.config.globalProperties.$keycloak = keycloak
-  app.mount('#app')
-
-})
-.catch(err => {
-  console.error('Keycloak init failed:', err)
-
-  // Extra debugging info
-  if (err && err.message) {
-    console.error('Error message:', err.message)
   } else {
-    console.error('Full error object:', JSON.stringify(err))
-  }
+    console.log('Succesvol ingelogd!')
+    console.log('Gebruikersnaam:', keycloak.tokenParsed?.preferred_username)
+    console.log('Roles:', keycloak.realmAccess?.roles)
 
-  alert('Keycloak init failed. Check console for details.')
+    // --- ROUTES ---
+    const routes = [
+      { path: '/', component: DashboardPage },
+      { path: '/data', component: DataPage },
+      { path: '/notifications', component: NotificationsPage },
+      { 
+        path: '/settings', 
+        component: SettingsPage,
+        meta: { requiresRole: 'admin' } // Alleen admins
+      }
+    ]
+
+    const router = createRouter({
+      history: createWebHistory(),
+      routes
+    })
+
+    // --- NAVIGATION GUARD ---
+    router.beforeEach((to, from, next) => {
+      if (to.meta.requiresRole) {
+        const hasRole = keycloak.hasRealmRole(to.meta.requiresRole)
+        if (hasRole) {
+          next()
+        } else {
+          alert('⛔ Geen toegang! Je hebt geen admin rechten.')
+          next('/')
+        }
+      } else {
+        next()
+      }
+    })
+
+    // --- VUE APP ---
+    const app = createApp(App)
+    app.use(router)
+    app.config.globalProperties.$keycloak = keycloak
+    app.mount('#app')
+  }
+}).catch(err => {
+  console.error('Keycloak init failed', err)
 })
