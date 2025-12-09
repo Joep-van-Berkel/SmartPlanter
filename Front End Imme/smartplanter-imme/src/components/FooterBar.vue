@@ -6,7 +6,7 @@
     </div>
 
     <div class="links">
-      <button class="logoutButton"><img src="../assets/logout.png" class="footerIcoon" alt="logout"/></button>
+      <button class="logoutButton" @click="logout"><img src="../assets/logout.png" class="footerIcoon" alt="logout"/></button>
 
       <a href="mailto:ima.piels@student.avans.nl">
         <img src="../assets/mail.png" class="footerIcoon" alt="mail"></img></a>
