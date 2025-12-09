@@ -67,7 +67,11 @@ keycloak.init({ onLoad: initOptions.onLoad })
         .then((refreshed) => {
           if (refreshed) console.log('🔄 Token refreshed')
         })
-        .catch(() => console.error('❌ Failed to refresh token'))
+        .catch(() => 
+          console.error('❌ Failed to refresh token'))
     }, 60000)
   })
-  .catch(() => console.error("Authentication Failed"))
+  .catch((error) => {
+  console.error("Authentication Failed");
+  console.error(error);
+});
