@@ -35,6 +35,11 @@ async function checkRealmConfig() {
 
 // --- Functie om Keycloak te initialiseren ---
 async function initKeycloak() {
+  // --- Opschonen van oude tokens/URL fragmenten ---
+  localStorage.clear()
+  sessionStorage.clear()
+  window.history.replaceState({}, document.title, "/")
+
   const realmOk = await checkRealmConfig()
   if (!realmOk) {
     alert('Kon Keycloak realm config niet ophalen. Controleer URL, netwerk en SSL.')
@@ -46,8 +51,9 @@ async function initKeycloak() {
       onLoad: 'login-required',
       checkLoginIframe: false,
       enableLogging: true,
-      pkceMethod: 'S256',        // PKCE verplicht voor moderne SPA clients
-      responseMode: 'query',      // voorkomt Invalid nonce errors
+      pkceMethod: 'S256',           // PKCE verplicht voor moderne SPA clients
+      responseMode: 'query',         // voorkomt Invalid nonce errors
+      redirectUri: window.location.origin // expliciet redirectUri
     })
 
     console.log('Keycloak init successful')
@@ -71,7 +77,7 @@ async function initKeycloak() {
       }).catch(err => {
         console.warn('Token refresh failed', err)
       })
-    }, 60000) // 60 sec
+    }, 60000)
 
     // --- ROUTES ---
     const routes = [
