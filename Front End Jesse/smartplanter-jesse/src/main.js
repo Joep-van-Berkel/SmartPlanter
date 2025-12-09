@@ -10,20 +10,29 @@ import './assets/styles/theme.css'
 
 // --- Keycloak Configuratie ---
 const keycloak = new Keycloak({
-  url: 'https://141.148.237.73:8443', 
+  url: 'https://141.148.237.73:8443', // Let op: geen /auth, want jouw server draait op root
   realm: 'smartplanter',
   clientId: 'frontend-jesse',
 })
 
-keycloak.init({
-  onLoad: 'login-required',
-  checkLoginIframe: false  // voorkomt iframe issues bij sommige browsers
-}).then(authenticated => {
-  if (!authenticated) {
-    console.warn('Niet ingelogd! Herlaad de pagina...')
-    window.location.reload()
-  } else {
-    console.log('Succesvol ingelogd!')
+// --- Functie om Keycloak te initialiseren ---
+async function initKeycloak() {
+  try {
+    const authenticated = await keycloak.init({
+      onLoad: 'login-required',
+      checkLoginIframe: false,
+      enableLogging: true
+    })
+
+    console.log('Keycloak init successful')
+    console.log('Authenticated:', authenticated)
+
+    if (!authenticated) {
+      console.warn('Niet ingelogd! Herlaad de pagina...')
+      window.location.reload()
+      return
+    }
+
     console.log('Gebruikersnaam:', keycloak.tokenParsed?.preferred_username)
     console.log('Roles:', keycloak.realmAccess?.roles)
 
@@ -48,6 +57,7 @@ keycloak.init({
     router.beforeEach((to, from, next) => {
       if (to.meta.requiresRole) {
         const hasRole = keycloak.hasRealmRole(to.meta.requiresRole)
+        console.log(`Checking role for route ${to.path}:`, hasRole)
         if (hasRole) {
           next()
         } else {
@@ -64,7 +74,17 @@ keycloak.init({
     app.use(router)
     app.config.globalProperties.$keycloak = keycloak
     app.mount('#app')
+
+  } catch (err) {
+    console.error('Keycloak init failed:', err)
+    if (err && err.message) {
+      console.error('Error message:', err.message)
+    } else {
+      console.error('Full error object:', JSON.stringify(err))
+    }
+    alert('Keycloak init failed. Check console for network/CORS/SSL issues.')
   }
-}).catch(err => {
-  console.error('Keycloak init failed', err)
-})
+}
+
+// --- Start Keycloak en app ---
+initKeycloak()
