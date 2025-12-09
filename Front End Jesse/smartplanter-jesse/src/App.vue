@@ -1,7 +1,5 @@
 <template>
-  <div id="app">
-    <router-view />
-  </div>
+  <router-view/>
 </template>
 
 <script>
@@ -11,7 +9,7 @@ export default {
     return {
       username: '',
       token: ''
-    }
+    };
   },
   mounted() {
     // Haal de instantie op die we in main.js hebben ingesteld
@@ -28,40 +26,28 @@ export default {
       this.$keycloak.logout();
     }
   }
-}
+};
 </script>
 
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');
+#app {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
 
-body {
-  font-family: "Poppins", sans-serif;
-  background: var(--bg);
+router-view {
+  flex: 1;
+}
+
+* {
   margin: 0;
   padding: 0;
 }
 
-* {
-  transition: background-color 0.3s ease, 
-              color 0.3s ease,
-              border-color 0.3s ease;
-}
-
-::selection {
-  background-color: var(--primary);
-  color: var(--primary-dark);
-}
-
-::-webkit-scrollbar {
-  width: 10px;
-}
-::-webkit-scrollbar-track {
-  background: var(--primary-dark);
-}
-::-webkit-scrollbar-thumb {
-  background: var(--primary);
-}
-::-webkit-scrollbar-thumb:hover {
-  background: var(--primary);
+body {
+  background: #46e94862; 
+  /* background: #8cc68d62; */
+  /* background: #9dffb17d; */
 }
 </style>
