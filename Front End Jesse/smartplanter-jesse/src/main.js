@@ -23,7 +23,6 @@ keycloak.init({
     console.log("🔐 Keycloak login OK");
     initVue();
     // Na login ga je altijd naar dashboard
-    router.push('/dashboard');
   } else {
     console.warn("❌ Niet ingelogd, redirect naar Keycloak");
     keycloak.login();
