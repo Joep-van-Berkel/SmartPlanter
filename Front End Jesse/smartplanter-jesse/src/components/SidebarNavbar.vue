@@ -75,29 +75,15 @@
   top: 0;
   left: 0;
   min-height: 100%;
-  width: 4.5rem;
+  width: 4.5rem; /* start klein */
   display: flex;
   flex-direction: column;
   background: var(--light);
   box-shadow: 5px 0 10px rgba(0,0,0,0.3);
-  transition: width 0.25s ease;
+  transition: width 0.3s ease;
   overflow: hidden;
   user-select: none;
   z-index: 1000;
-}
-
-/* ================= COLLAPSED MODE ================= */
-.sidebar:not(:hover) .nav-item,
-.sidebar:not(:hover) .logo {
-  justify-content: center;       /* Icoontjes exact in het midden */
-  margin-left: 0;
-}
-
-.sidebar:not(:hover) .label,
-.sidebar:not(:hover) .username,
-.sidebar:not(:hover) .usermail,
-.sidebar:not(:hover) .notificationCount {
-  display: none !important;      /* Geen ruimte innemen */
 }
 
 /* ================= LOGO ================= */
@@ -107,7 +93,6 @@
   height: 5rem;
   margin-left: 1rem;
   color: var(--text);
-  transition: margin 0.25s ease;
 }
 
 .logo i {
@@ -121,7 +106,7 @@
   font-size: 22px;
   font-weight: bold;
   opacity: 0;
-  transition: opacity 0.25s ease;
+  transition: opacity 0.3s ease;
 }
 
 /* ================= NAVIGATIE ================= */
@@ -135,8 +120,8 @@
   background: none;
   border: none;
   text-decoration: none;
-  margin-left: 1rem;
-  transition: all 0.25s ease;
+  /*margin-left: 1rem;*/
+  transition: all 0.3s ease;
   cursor: pointer;
 }
 
@@ -149,10 +134,9 @@
 .nav-item .label {
   font-size: 22px;
   opacity: 0;
-  transition: opacity 0.25s ease;
+  transition: opacity 0.3s ease;
 }
 
-/* ================= ACTIVE STATE ================= */
 .nav-item.router-link-active,
 .nav-item.router-link-active i {
   color: var(--primary);
@@ -180,7 +164,7 @@ li {
   position: relative;
 }
 
-/* ================= BADGE ================= */
+/* ================= MELDING-BADGE ================= */
 .notificationCount {
   display: flex;
   align-items: center;
@@ -192,7 +176,7 @@ li {
   font-weight: 600;
   margin-left: 0.5rem;
   opacity: 0;
-  transition: opacity 0.25s ease;
+  transition: opacity 0.3s ease;
 }
 
 /* ================= PROFIEL ================= */
@@ -201,7 +185,12 @@ li {
   align-items: center;
   padding: 0.1rem;
   border-top: 2px solid var(--bg);
-  transition: all 0.25s ease;
+  transition: all 0.3s ease;
+}
+
+.profile .username,
+.profile .usermail {
+  color: var(--text);
 }
 
 .profilePicture {
@@ -228,12 +217,12 @@ li {
 
 .username, .usermail {
   opacity: 0;
-  transition: opacity 0.25s ease;
+  transition: opacity 0.3s ease;
 }
 
-/* ================= HOVER: EXPAND MODE ================= */
+/* ================= HOVER EFFECT ================= */
 .sidebar:hover {
-  width: 20rem;
+  width: 20rem; /* volledige breedte */
 }
 
 .sidebar:hover .logo-text,
@@ -243,5 +232,4 @@ li {
 .sidebar:hover .usermail {
   opacity: 1;
 }
-
 </style>
