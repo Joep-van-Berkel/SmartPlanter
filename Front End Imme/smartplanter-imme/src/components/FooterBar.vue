@@ -1,4 +1,5 @@
 <template>
+
   <footer class="footer">
     <div class="accountNaam">
       <span1>Gebruikersnaam</span1>
@@ -6,7 +7,7 @@
     </div>
 
     <div class="links">
-      <button class="logoutButton" @click="logout"><img src="../assets/logout.png" class="footerIcoon" alt="logout"/></button>
+      <button class="logoutButton" @click="doLogout"><img src="../assets/logout.png" class="footerIcoon" alt="logout"/></button>
 
       <a href="mailto:ima.piels@student.avans.nl">
         <img src="../assets/mail.png" class="footerIcoon" alt="mail"></img></a>
@@ -17,8 +18,14 @@
 </template>
 
 <script>
+
 export default {
-  name: "FooterBar"
+  name: "FooterBar",
+  methods : {
+    doLogout(){
+      this.$emit("logout")
+    }
+  }
 };
 </script>
 

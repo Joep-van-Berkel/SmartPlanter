@@ -6,6 +6,7 @@ import { createVuetify } from 'vuetify'
 import * as components from 'vuetify/components'
 import * as directives from 'vuetify/directives'
 import Keycloak from 'keycloak-js'
+import Home from './pages/Home.vue'
 
 const vuetify = createVuetify({
   components,
@@ -57,7 +58,8 @@ keycloak.init({ onLoad: initOptions.onLoad })
   // --- ROUTER CONFIGURATIE ---
       
       const routes = [
-        { path: '/', component: HomeView },
+        { path: '/', component: Home },
+    
         { 
           path: '/admin', 
           component: AdminView,
