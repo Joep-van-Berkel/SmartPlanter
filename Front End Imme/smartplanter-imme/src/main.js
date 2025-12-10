@@ -22,7 +22,6 @@ const initOptions = {
 
 const keycloak = new Keycloak(initOptions)
 
-// Creëer de Vue app instantie (maar mount deze nog niet)
 const app = createApp(App)
 
 keycloak.init({ onLoad: initOptions.onLoad })
@@ -37,14 +36,12 @@ keycloak.init({ onLoad: initOptions.onLoad })
     window.$keycloak = keycloak
    app.config.globalProperties.$keycloak = keycloak
     
-  // Router en Vuetify aan de app toevoegen
     app.use(router)
     app.use(vuetify)
 
 
     router.isReady().then(() => {
         app.mount('#app')
-        console.log("App mounted after Keycloak auth and router ready")
     })
 
  setInterval(() => {
