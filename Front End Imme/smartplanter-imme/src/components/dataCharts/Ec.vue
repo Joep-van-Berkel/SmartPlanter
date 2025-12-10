@@ -1,9 +1,9 @@
 <template>
 <div class="linechart">
-    <canvas ref="canvasEl">
+    <canvas ref="canvasEl"></canvas>
       <p class="datawaarde-uitleg">EC waarde:</p>
       <p class="data-betekenis">Deze EC waarde is:...</p>
-    </canvas>
+
 </div>
 </template>
 
