@@ -3,6 +3,7 @@ import { createApp } from 'vue'
 import App from './App.vue'
 import Keycloak from 'keycloak-js'
 import router, { setKeycloak } from './router'
+import './assets/styles/theme.css'
 
 // --- KEYCLOAK CONFIG ---
 const initOptions = {
