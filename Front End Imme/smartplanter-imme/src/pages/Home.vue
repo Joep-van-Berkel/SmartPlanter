@@ -1,19 +1,18 @@
 <template>
-  <div class="moestuinbuis">
-    <div class="button-row">
-      <Dropdown v-for="(d, i) in 4" :key="i" />
-    </div>
-  </div>
-
-  <div class="moestuinbuis2">
-    <div class="button-row">
-      <Dropdown v-for="(d, i) in 4" :key="i" />
-    </div>
-  </div>
-
-  <div class="moestuinbuis3">
-    <div class="button-row">
-      <Dropdown v-for="(d, i) in 4" :key="i" />
+  <div>
+    <div 
+      v-for="(buis, buisIndex) in buisSelecties" 
+      :key="buisIndex" 
+      :class="'moestuinbuis' + (buisIndex + 1)"
+    >
+      <div class="button-row">
+        <Dropdown 
+          v-for="i in 4" 
+          :key="i"
+          :modelValue="buis[i - 1]"
+          @update:modelValue="updateSelection(buisIndex, i - 1, $event)"
+        />
+      </div>
     </div>
   </div>
 </template>
@@ -21,24 +20,52 @@
 <script setup>
 import { ref, defineComponent, computed } from 'vue'
 
-// 🔽 Inline Dropdown component (geen apart bestand nodig!)
+// ----------------------------------------------------
+// 1. STATE MANAGEMENT IN DE PARENT COMPONENT
+// De centrale staat die alle 12 (3 buizen * 4 plekken) selecties opslaat
+// ----------------------------------------------------
+const buisSelecties = ref([
+  [null, null, null, null], // Buis 1: 4 plekken
+  [null, null, null, null], // Buis 2: 4 plekken
+  [null, null, null, null]  // Buis 3: 4 plekken
+])
+
+// Functie die wordt aangeroepen door de Dropdown om een selectie bij te werken
+const updateSelection = (buisIndex, plekIndex, newValue) => {
+  buisSelecties.value[buisIndex][plekIndex] = newValue
+}
+
+
+// ----------------------------------------------------
+// 2. DE HERBRUIKBARE DROPDOWN COMPONENT
+// Beheert zijn eigen UI-status (open/gesloten, zoekterm), 
+// maar laat de selectiewaarde over aan de parent via v-model.
+// ----------------------------------------------------
 const Dropdown = defineComponent({
   name: 'Dropdown',
+  
+  // Definieer de prop voor v-model (modelValue)
+  props: {
+    modelValue: {
+      type: String,
+      default: null 
+    }
+  },
+  // Definieer de emit voor v-model (@update:modelValue)
+  emits: ['update:modelValue'],
 
-  setup() {
+  setup(props, { emit }) {
     const open = ref(false)
-    const selected = ref(null)
     const search = ref("")
 
-    // volledige lijst
     const items = [
       'Komkommer', 'Courgette', 'Aardbeien', 'Wortels',
       'Tomaat', 'Paprika', 'Sla', 'Boontjes',
       'Ui', 'Knoflook', 'Spinazie', 'Radijs',
-      'Aubergine', 'Prei', 'Spruiten', 'Bieten'
+      'Aubergine', 'Prei', 'Spruiten', 'Bieten',
+      'Bosbes', 'Framboos', 'Peterselie', 'Munt' // Extra opties
     ]
 
-    // gefilterde lijst op basis van zoekterm
     const filteredItems = computed(() =>
       items.filter(item =>
         item.toLowerCase().includes(search.value.toLowerCase())
@@ -46,50 +73,56 @@ const Dropdown = defineComponent({
     )
 
     const toggle = () => open.value = !open.value
-
-    const choose = (item) => {
-      selected.value = item
+    
+    // De selectie wordt ge-emit naar de parent
+    const choose = item => {
+      emit('update:modelValue', item) // Stuurt de nieuwe waarde omhoog
       open.value = false
       search.value = ""
     }
 
-    return { open, selected, search, filteredItems, toggle, choose }
+    // Geef 'props' terug zodat we er in de template bij kunnen
+    return { open, search, filteredItems, toggle, choose, props } 
   },
 
+  // ⬇️ DE INLINE TEMPLATE VOOR DE DROPDOWN COMPONENT
   template: `
-    <div class="dropdown-container">
-      <button class="select-button" @click="toggle">
-        {{ selected || 'Selecteer groente' }}
-      </button>
+<div class="dropdown-container">
+  <button class="select-button" @click="toggle">
+    {{ props.modelValue || 'Selecteer groente' }}
+  </button>
 
-      <div v-if="open" class="dropdown">
-        <!-- 🔍 Zoekveld -->
-        <input
-          class="dropdown-search"
-          type="text"
-          v-model="search"
-          placeholder="Zoek..."
-        />
+  <div v-if="open" class="dropdown">
+    <input
+      class="dropdown-search"
+      type="text"
+      v-model="search"
+      placeholder="Zoek..."
+    />
 
-        <!-- Gefilterde lijst -->
-        <ul>
-          <li v-for="item in filteredItems" :key="item" @click="choose(item)">
-            {{ item }}
-          </li>
+    <ul>
+      <li
+        v-for="item in filteredItems"
+        :key="item"
+        @click="choose(item)"
+        :class="{ 'selected-item': item === props.modelValue }"
+      >
+        {{ item }}
+      </li>
 
-          <li v-if="filteredItems.length === 0" class="empty">
-            Geen resultaten
-          </li>
-        </ul>
-      </div>
-    </div>
-  `
+      <li v-if="filteredItems.length === 0" class="empty">
+        Geen resultaten
+      </li>
+    </ul>
+  </div>
+</div>
+`
 })
 </script>
 
 <style>
 /* --- Moestuinbuizen --- */
-.moestuinbuis, .moestuinbuis2, .moestuinbuis3 {
+.moestuinbuis1, .moestuinbuis2, .moestuinbuis3 {
   background-color: rgb(85, 85, 85);
   width: 80%;
   height: 20vh;
@@ -98,11 +131,8 @@ const Dropdown = defineComponent({
   display: flex;
   align-items: center;
   justify-content: center;
+  margin-top: 5vh;
 }
-
-.moestuinbuis { margin-top: 5vh; }
-.moestuinbuis2 { margin-top: 5vh; }
-.moestuinbuis3 { margin-top: 5vh; }
 
 .button-row {
   display: flex;
@@ -123,6 +153,10 @@ const Dropdown = defineComponent({
   font-size: 0.9rem;
   min-width: 10rem;
   text-align: left;
+  /* Zorgt ervoor dat de tekst niet buiten de knop valt als er veel tekst is */
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 
 .dropdown {
@@ -140,6 +174,7 @@ const Dropdown = defineComponent({
   display: flex;
   flex-direction: column;
   gap: 0.4rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Optioneel: schaduw */
 }
 
 .dropdown-search {
@@ -147,6 +182,7 @@ const Dropdown = defineComponent({
   padding: 0.4rem;
   border: 1px solid #bbb;
   border-radius: 5px;
+  box-sizing: border-box; /* Zorgt dat padding binnen de breedte valt */
 }
 
 .dropdown ul {
@@ -163,6 +199,12 @@ const Dropdown = defineComponent({
 
 .dropdown li:hover {
   background-color: #eee;
+}
+
+/* Visuele feedback voor reeds geselecteerd item */
+.selected-item {
+    background-color: #d1e7dd; /* Een lichtgroene kleur */
+    font-weight: bold;
 }
 
 .empty {
