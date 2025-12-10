@@ -64,7 +64,7 @@ new Chart(canvasEl.value, {
 }
 
 .data-betekenis{
-  margin-top: 1rem;
+  margin-top: 0.7rem;
   font-size: 0.9rem;
   color: #333;
 }

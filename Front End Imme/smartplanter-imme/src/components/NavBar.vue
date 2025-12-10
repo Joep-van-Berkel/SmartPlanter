@@ -28,7 +28,7 @@ export default {
   background: #2d6a4f;
   padding: 15px 25px;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-   box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+   box-shadow: 0 2px 8px rgba(0,0,0,0.25);
 }
 
 .navigatie{
