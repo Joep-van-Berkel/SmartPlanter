@@ -32,6 +32,8 @@ keycloak.init({ onLoad: initOptions.onLoad })
     console.log("Router instance:", router)
     console.log("Router routes:", router.getRoutes())
 
+    window.$keycloak = keycloak
+
     const app = createApp(App)
     app.use(router)
     app.use(vuetify)
