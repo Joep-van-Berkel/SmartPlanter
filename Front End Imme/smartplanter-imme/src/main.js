@@ -29,6 +29,8 @@ keycloak.init({ onLoad: initOptions.onLoad })
     }
 
     console.log("Authenticated")
+    console.log("Router instance:", router)
+    console.log("Router routes:", router.getRoutes())
 
     const app = createApp(App)
     app.use(router)
