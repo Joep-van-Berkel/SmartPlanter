@@ -28,7 +28,7 @@ function logout() {
     <nav>
       <ul>
         <li>
-          <router-link to="/dashboard" class="nav-item">
+          <router-link to="/" class="nav-item">
             <i class="fa-solid fa-border-all"></i>
             <span class="label">Dashboard</span>
           </router-link>

@@ -2,6 +2,8 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import DashboardPage from './pages/DashboardPage.vue'
 import SettingsPage from './pages/SettingsPage.vue'
+import DataPage from './pages/DataPage.vue'
+import NotificationsPage from './pages/NotificationsPage.vue'
 
 let keycloakInstance = null
 
@@ -12,11 +14,9 @@ export function setKeycloak(keycloak) {
 
 const routes = [
   { path: '/', component: DashboardPage },
-  {
-    path: '/admin',
-    component: SettingsPage,
-    meta: { requiresRole: 'admin' }
-  }
+  { path: '/notifications', component: NotificationsPage },
+  { path: '/data', component: DataPage },
+  { path: '/settings', component: SettingsPage },
 ]
 
 const router = createRouter({
