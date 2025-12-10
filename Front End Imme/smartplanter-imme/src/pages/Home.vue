@@ -13,28 +13,24 @@ export default {
 
 <style>
 
+.moestuinbuis, .moestuinbuis2, .moestuinbuis3 {
+  background-color: black;
+  width: 80%;       
+  height: 20vh;     
+  margin-left: 10%; 
+  border-radius: 10px; 
+}
+
 .moestuinbuis {
-  background-color:black;
-  width: 80%;
-  height: 20%;
-  margin-left: 10%;
-  margin-top: 30%;
+  margin-top: 5vh;
 }
 
 .moestuinbuis2 {
-  background-color:black;
-  width: 80%;
-  height: 20%;
-  margin-left: 10%;
-  margin-top: 60%;
+  margin-top: 5vh;
 }
 
 .moestuinbuis3 {
-  background-color:black;
-  width: 80%;
-  height: 20%;
-  margin-left: 10%;
-  margin-top: 100%;
+  margin-top: 5vh;
 }
 
 </style>

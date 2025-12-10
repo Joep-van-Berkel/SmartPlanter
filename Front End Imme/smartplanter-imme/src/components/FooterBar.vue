@@ -41,7 +41,7 @@ export default {
 }
 
 .footer {
-  box-shadow: 0 -4px 25px rgba(0,0,0,0.35);
+  box-shadow: 0 -4px 25px rgba(0,0,0,0.25);
 }
 
 .footerIcoon{
