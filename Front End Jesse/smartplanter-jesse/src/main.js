@@ -1,58 +1,35 @@
-// main.js
-import { createApp } from 'vue'
-import App from './App.vue'
-import Keycloak from 'keycloak-js'
-import router, { setKeycloak } from './router'
+import { createApp } from 'vue';
+import App from './App.vue';
+import Keycloak from 'keycloak-js';
 
-// --- KEYCLOAK CONFIG ---
+// --- STAP 1: Keycloak Configuratie ---
 const initOptions = {
-  url: 'https://141.148.237.73:8443',
-  realm: 'smartplanter',
-  clientId: 'frontend-jesse',
-  onLoad: 'check-sso',
-  checkLoginIframe : false
-}
+  // 💡 BELANGRIJK: Gebruik HIER uw externe HTTPS URL
+     url: 'https://141.148.237.73:8443', // ⬅️ PAS DIT AAN
+     realm: 'smartplanter',
+     clientId: 'frontend-jesse',
+};
 
-const keycloak = new Keycloak(initOptions)
+const keycloak = new Keycloak(initOptions);
 
-// Keycloak doorgeven aan router guards
-setKeycloak(keycloak)
+// --- STAP 2: Initialisatie en App Opstarten ---
+keycloak
+  .init({
+    onLoad: 'login-required', // Dwingt de gebruiker om in te loggen bij het opstarten
+    pkceMethod: 'S256', // Aanbevolen beveiligingsmethode
+  })
+  .then((authenticated) => {
+    if (authenticated) {
+      console.log('Gebruiker is succesvol geauthenticeerd');
 
-// --- INITIALISEER KEYCLOAK ---
-keycloak.init({
-  onLoad: initOptions.onLoad,
-  pkceMethod: 'S256',
-  checkLoginIframe : false
-})
-  .then((auth) => {
-    if (!auth) {
-      console.warn("⚠️ Keycloak authentication failed or canceled.")
-      keycloak.login({
-        redirectUri: 'https://smartplanterjesse-g2bcapewc6hwcgdy.westeurope-01.azurewebsites.net/'
-      });
-      return
+      // Maak de Keycloak-instantie globaal beschikbaar in de Vue-app
+      const app = createApp(App);
+      app.config.globalProperties.$keycloak = keycloak;
+      app.mount('#app');
+    } else {
+      console.log('Authenticatie mislukt of gebruiker is uitgelogd');
     }
-
-    console.log("Authenticated")
-
-    const app = createApp(App)
-
-    // Keycloak beschikbaar in hele app
-    app.config.globalProperties.$keycloak = keycloak
-
-    app.use(router)
-    app.mount('#app')
-
-    // TOKEN AUTO-REFRESH
-    setInterval(() => {
-      keycloak.updateToken(70)
-        .then((refreshed) => {
-          if (refreshed) console.log('🔄 Token refreshed')
-        })
-        .catch(() => console.error('❌ Failed to refresh token'))
-    }, 60000)
   })
-  .catch((error) => {
-    console.error("❌ Authentication Failed")
-    console.error(error)
-  })
+  .catch((e) => {
+    console.error('Fout bij het initialiseren van Keycloak:', e);
+  });
