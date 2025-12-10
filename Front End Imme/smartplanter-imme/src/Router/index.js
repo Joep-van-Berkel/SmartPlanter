@@ -17,15 +17,14 @@ const router = createRouter({
 })
 
 router.beforeEach((to, from, next) => {
-  const keycloak = router.app.config.globalProperties.$keycloak
+  // Gebruik window of de globalProperties via getCurrentInstance als je wilt
+  const keycloak = window.$keycloak || null
 
-  // Router is nog niet klaar → ga verder
   if (!keycloak) return next()
 
   if (to.meta.requiresAuth && !keycloak.authenticated) {
-    return keycloak.login({
-      redirectUri: window.location.origin + to.fullPath
-    })
+    keycloak.login({ redirectUri: window.location.origin + to.fullPath })
+    return
   }
 
   next()
