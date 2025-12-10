@@ -36,21 +36,23 @@
 export default {
   name: 'HomePagina',
   data() {
+    const createBuis = () => ({
+      slots: Array(4).fill(null).map(() => ({ plant: null, showDropdown: false }))
+    });
+
     return {
       searchQuery: '',
-      // Lijst met alle mogelijke groenten/fruit
       allePlanten: [
         'Tomaat', 'Wortel', 'Broccoli', 'Sla', 'Aardbei', 
         'Komkommer', 'Paprika', 'Aubergine', 'Courgette', 
-        'Pompoen', 'Radijs', 'Spinazie', 'Ui', 'Knoflook', 
-        'Bieslook', 'Peterselie'
-      ],
-      // De structuur die de status van de moestuin bijhoudt
+        'Appel', 'Radijs', 'Framboos', 'Ui', 'Knoflook', 
+        'Bramen', 'Basilicum'
+     ],
       moestuinLayout: [
-        { slots: Array(4).fill({ plant: null, showDropdown: false }) },
-        { slots: Array(4).fill({ plant: null, showDropdown: false }) },
-        { slots: Array(4).fill({ plant: null, showDropdown: false }) },
-      ]
+        createBuis(),
+        createBuis(),
+         createBuis(),
+     ]
     };
   },
   computed: {
@@ -105,7 +107,7 @@ export default {
 <style>
 /* Algemene container voor centrering */
 .garden-container {
-    max-width: 900px;
+    max-width: 1100;
     margin: 0 auto;
     padding: 20px;
 }
