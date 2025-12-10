@@ -1,41 +1,26 @@
 <script setup>
-import { ref, onMounted } from 'vue'
 
-const userFirstLetter = ref('')
-
-// Wanneer de DOM gemount is, pak de username en zet alleen de eerste letter
-onMounted(() => {
-  const usernameEl = document.querySelector('.username')
-  if (usernameEl && usernameEl.textContent) {
-    // Pak alleen de eerste letter van de volledige string
-    userFirstLetter.value = usernameEl.textContent.trim().charAt(0)
-  }
-})
 </script>
-
 
 <template>
   <div class="sidebar">
 
-    <!-- ========== LOGO SECTION ========== -->
+    <!-- LOGO -->
     <div class="logo">
       <i class="fa-solid fa-seedling"></i>
       <h1 class="logo-text">SmartPlanter</h1>
     </div>
     
-    <!-- ========== NAVIGATIE ========== -->
+    <!-- NAVIGATIE -->
     <nav>
       <ul>
-
-        <!-- Dashboard -->
         <li>
-          <router-link to="/dashboard" class="nav-item">
+          <router-link to="/" class="nav-item">
             <i class="fa-solid fa-border-all"></i>
             <span class="label">Dashboard</span>
           </router-link>
         </li>
 
-        <!-- Meldingen -->
         <li>
           <router-link to="/notifications" class="nav-item">
             <i class="fa-solid fa-bell"></i>
@@ -44,19 +29,15 @@ onMounted(() => {
           <p class="notificationCount">20</p>
         </li>
 
-        <!-- Data -->
         <li>
           <router-link to="/data" class="nav-item">
             <i class="fa-solid fa-chart-column"></i>
             <span class="label">Data</span>
           </router-link>
         </li>
-
       </ul>
 
       <ul>
-
-        <!-- Instellingen -->
         <li>
           <router-link to="/settings" class="nav-item">
             <i class="fa-solid fa-gear"></i>
@@ -64,25 +45,23 @@ onMounted(() => {
           </router-link>
         </li>
 
-        <!-- Uitloggen -->
         <li>
-          <a href="http://localhost:8080/" class="nav-item">
+          <button class="nav-item" @click="$auth.logout()">
             <i class="fa-solid fa-right-from-bracket"></i>
             <span class="label">Loguit</span>
-          </a>
+          </button>
         </li>
-
       </ul>
     </nav>
 
-    <!-- ========== PROFIEL SECTIE (ONDER) ========== -->
+    <!-- PROFIEL -->
     <div class="profile">
       <div class="profilePicture">
-        <span>{{ userFirstLetter }}</span>
+        <span>{{ $auth.user.firstLetter}}</span>
       </div>
       <div class="profileInfo">
-        <span class="username">Jesse de Poot</span> <!-- Wordt uit DB gevuld -->
-        <span class="usermail">jessedepoot@hotmail.com</span>
+        <span class="username">{{ $auth.user.fullName }}</span>
+        <span class="usermail">{{ $auth.user.email }}</span>
       </div>
     </div>
 
@@ -138,9 +117,12 @@ onMounted(() => {
   font-size: 30px;
   font-weight: 500;
   color: var(--text);
+  background: none;
+  border: none;
   text-decoration: none;
   margin-left: 1rem;
   transition: all 0.3s ease;
+  cursor: pointer;
 }
 
 .nav-item i {
