@@ -22,7 +22,6 @@ import { ref, defineComponent, computed } from 'vue'
 
 // ----------------------------------------------------
 // 1. STATE MANAGEMENT IN DE PARENT COMPONENT
-// De centrale staat die alle 12 (3 buizen * 4 plekken) selecties opslaat
 // ----------------------------------------------------
 const buisSelecties = ref([
   [null, null, null, null], // Buis 1: 4 plekken
@@ -30,16 +29,14 @@ const buisSelecties = ref([
   [null, null, null, null]  // Buis 3: 4 plekken
 ])
 
-// Functie die wordt aangeroepen door de Dropdown om een selectie bij te werken
+// Functie om de selectie in de centrale buisSelecties state bij te werken
 const updateSelection = (buisIndex, plekIndex, newValue) => {
   buisSelecties.value[buisIndex][plekIndex] = newValue
 }
 
 
 // ----------------------------------------------------
-// 2. DE HERBRUIKBARE DROPDOWN COMPONENT
-// Beheert zijn eigen UI-status (open/gesloten, zoekterm), 
-// maar laat de selectiewaarde over aan de parent via v-model.
+// 2. DE HERBRUIKBARE DROPDOWN COMPONENT (FIXED)
 // ----------------------------------------------------
 const Dropdown = defineComponent({
   name: 'Dropdown',
@@ -63,7 +60,7 @@ const Dropdown = defineComponent({
       'Tomaat', 'Paprika', 'Sla', 'Boontjes',
       'Ui', 'Knoflook', 'Spinazie', 'Radijs',
       'Aubergine', 'Prei', 'Spruiten', 'Bieten',
-      'Bosbes', 'Framboos', 'Peterselie', 'Munt' // Extra opties
+      'Bosbes', 'Framboos', 'Peterselie', 'Munt'
     ]
 
     const filteredItems = computed(() =>
@@ -81,15 +78,15 @@ const Dropdown = defineComponent({
       search.value = ""
     }
 
-    // Geef 'props' terug zodat we er in de template bij kunnen
-    return { open, search, filteredItems, toggle, choose, props } 
+    // We hoeven 'props' niet terug te geven voor correcte rendering
+    return { open, search, filteredItems, toggle, choose } 
   },
 
-  // ⬇️ DE INLINE TEMPLATE VOOR DE DROPDOWN COMPONENT
+  // ⬇️ DE GEFIXTE INLINE TEMPLATE
   template: `
 <div class="dropdown-container">
   <button class="select-button" @click="toggle">
-    {{ props.modelValue || 'Selecteer groente' }}
+    {{ modelValue || 'Selecteer groente' }}
   </button>
 
   <div v-if="open" class="dropdown">
@@ -105,7 +102,7 @@ const Dropdown = defineComponent({
         v-for="item in filteredItems"
         :key="item"
         @click="choose(item)"
-        :class="{ 'selected-item': item === props.modelValue }"
+        :class="{ 'selected-item': item === modelValue }"
       >
         {{ item }}
       </li>
@@ -123,7 +120,7 @@ const Dropdown = defineComponent({
 <style>
 /* --- Moestuinbuizen --- */
 .moestuinbuis1, .moestuinbuis2, .moestuinbuis3 {
-  background-color: rgb(85, 85, 85);
+  background-color: rgb(140, 140, 140);
   width: 80%;
   height: 20vh;
   margin-left: 10%;
