@@ -10,7 +10,7 @@ import SettingsPage from './pages/SettingsPage.vue'
 const initOptions = {
   url: 'https://141.148.237.73:8443/',
   realm: 'smartplanter',
-  clientId: 'frontend-jesse',
+  clientId: 'frontend-imme',
   onLoad: 'login-required'
 }
 
