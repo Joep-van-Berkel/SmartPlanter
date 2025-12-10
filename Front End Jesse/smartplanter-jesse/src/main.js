@@ -27,6 +27,9 @@ keycloak.init({
   .then((auth) => {
     if (!auth) {
       console.warn("⚠️ Keycloak authentication failed or canceled.")
+      keycloak.login({
+        redirectUri: 'https://smartplanterjesse-g2bcapewc6hwcgdy.westeurope-01.azurewebsites.net/'
+      });
       return
     }
 
