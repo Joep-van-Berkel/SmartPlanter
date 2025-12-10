@@ -9,6 +9,8 @@ const initOptions = {
   url: 'https://141.148.237.73:8443',
   realm: 'smartplanter',
   clientId: 'frontend-jesse',
+  onLoad: 'check-sso',
+  checkLoginIframe : false
 }
 
 const keycloak = new Keycloak(initOptions)
@@ -18,8 +20,9 @@ setKeycloak(keycloak)
 
 // --- INITIALISEER KEYCLOAK ---
 keycloak.init({
-  onLoad: 'login-required',
-  pkceMethod: 'S256'
+  onLoad: initOptions.onLoad,
+  pkceMethod: 'S256',
+  checkLoginIframe : false
 })
   .then((auth) => {
     if (!auth) {
