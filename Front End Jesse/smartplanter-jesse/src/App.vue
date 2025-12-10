@@ -7,6 +7,27 @@
 <script>
 export default {
   name: 'App',
+  data() {
+    return {
+      username: '',
+      token: ''
+    }
+  },
+  mounted() {
+    // Haal de instantie op die we in main.js hebben ingesteld
+    const keycloak = this.$keycloak;
+    
+    if (keycloak && keycloak.authenticated) {
+      // Probeer username uit diverse velden te halen
+      this.username = keycloak.tokenParsed.preferred_username || keycloak.tokenParsed.name || 'Gebruiker';
+      this.token = keycloak.token;
+    }
+  },
+  methods: {
+    logout() {
+      this.$keycloak.logout();
+    }
+  }
 }
 </script>
 

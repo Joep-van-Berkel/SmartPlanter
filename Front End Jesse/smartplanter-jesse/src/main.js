@@ -1,31 +1,58 @@
-// src/main.js
-import { createApp } from 'vue';
-import App from './App.vue';
-import router from './router';
-import keycloak from './keycloak';
-import './assets/styles/theme.css';
+// main.js
+import { createApp } from 'vue'
+import App from './App.vue'
+import Keycloak from 'keycloak-js'
+import router, { setKeycloak } from './router'
 
-function initVue() {
-  const app = createApp(App);
-
-  // Keycloak beschikbaar in alle components
-  app.config.globalProperties.$keycloak = keycloak;
-
-  app.use(router);
-  app.mount('#app');
+// --- KEYCLOAK CONFIG ---
+const initOptions = {
+  url: 'https://141.148.237.73:8443',
+  realm: 'smartplanter',
+  clientId: 'frontend-jesse',
+  onLoad: 'check-sso',
+  checkLoginIframe : false
 }
 
+const keycloak = new Keycloak(initOptions)
+
+// Keycloak doorgeven aan router guards
+setKeycloak(keycloak)
+
+// --- INITIALISEER KEYCLOAK ---
 keycloak.init({
-  onLoad: 'login-required', // verplicht inloggen
+  onLoad: initOptions.onLoad,
   pkceMethod: 'S256',
-}).then((authenticated) => {
-  if (authenticated) {
-    console.log("🔐 Keycloak login OK");
-    initVue();
-    // Na login ga je altijd naar dashboard
-    router.push('/dashboard');
-  } else {
-    console.warn("❌ Niet ingelogd, redirect naar Keycloak");
-    keycloak.login();
-  }
-});
+  checkLoginIframe : false
+})
+  .then((auth) => {
+    if (!auth) {
+      console.warn("⚠️ Keycloak authentication failed or canceled.")
+      keycloak.login({
+        redirectUri: 'https://smartplanterjesse-g2bcapewc6hwcgdy.westeurope-01.azurewebsites.net/'
+      });
+      return
+    }
+
+    console.log("Authenticated")
+
+    const app = createApp(App)
+
+    // Keycloak beschikbaar in hele app
+    app.config.globalProperties.$keycloak = keycloak
+
+    app.use(router)
+    app.mount('#app')
+
+    // TOKEN AUTO-REFRESH
+    setInterval(() => {
+      keycloak.updateToken(70)
+        .then((refreshed) => {
+          if (refreshed) console.log('🔄 Token refreshed')
+        })
+        .catch(() => console.error('❌ Failed to refresh token'))
+    }, 60000)
+  })
+  .catch((error) => {
+    console.error("Authentication Failed")
+    console.error(error)
+  })
