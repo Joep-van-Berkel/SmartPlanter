@@ -85,13 +85,13 @@ export default {
 
     // Sluit alle dropdowns
     closeAllDropdowns() {
-      this.moestuinLayout.forEach(buis => {
-        buis.slots.forEach(slot => {
-          // Gebruik Vue.set om ervoor te zorgen dat Vue de verandering detecteert
-          this.$set(slot, 'showDropdown', false);
-        });
-      });
-    },
+  this.moestuinLayout.forEach(buis => {
+    buis.slots.forEach(slot => {
+      // Verwijder this.$set en wijzig de eigenschap direct
+      slot.showDropdown = false; 
+    });
+  });
+},
 
     // Slaat de gekozen plant op en sluit de dropdown
     selectPlant(buisIndex, slotIndex, plantNaam) {
