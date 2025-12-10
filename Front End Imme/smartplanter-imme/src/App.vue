@@ -1,7 +1,7 @@
 <template>
     <NavBar/>
   <router-view/>
-  <FooterBar/>
+  <FooterBar @logout="logout"/>
 
 
 </template>
@@ -16,6 +16,7 @@ export default {
   name: 'App',
   components: {
     FooterBar, NavBar,
+  },
   data() {
     return {
       username: '',
@@ -37,8 +38,8 @@ export default {
       this.$keycloak.logout();
     }
   }
-}
-}
+};
+
 
 </script>
 
