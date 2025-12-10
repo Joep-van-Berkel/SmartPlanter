@@ -1,6 +1,7 @@
+// main.js - Aangepaste code voor initiële navigatie
 import { createApp } from 'vue'
 import App from './App.vue'
-import router from './Router'
+import router from './Router' // Zorg ervoor dat dit de geëxporteerde router is
 import 'vuetify/styles'
 import { createVuetify } from 'vuetify'
 import * as components from 'vuetify/components'
@@ -21,34 +22,37 @@ const initOptions = {
 
 const keycloak = new Keycloak(initOptions)
 
+// Creëer de Vue app instantie (maar mount deze nog niet)
+const app = createApp(App)
+
 keycloak.init({ onLoad: initOptions.onLoad })
   .then(auth => {
     if (!auth) {
-      window.location.reload()
-      return
-    }
+     window.location.reload()
+    return
+  }
 
-    console.log("Authenticated")
-    console.log("Router instance:", router)
-    console.log("Router routes:", router.getRoutes())
+   console.log("Authenticated")
 
     window.$keycloak = keycloak
-
-    const app = createApp(App)
+   app.config.globalProperties.$keycloak = keycloak
+    
+  // Router en Vuetify aan de app toevoegen
     app.use(router)
     app.use(vuetify)
 
-    app.config.globalProperties.$keycloak = keycloak
 
-    app.mount('#app')
+    router.isReady().then(() => {
+        app.mount('#app')
+        console.log("App mounted after Keycloak auth and router ready")
+    })
 
-    // Token refresh
-    setInterval(() => {
-      keycloak.updateToken(70)
-        .then(ref => {
-          if (ref) console.log("Token refreshed")
+ setInterval(() => {
+     keycloak.updateToken(70)
+       .then(ref => {
+         if (ref) console.log("Token refreshed")
         })
-        .catch(() => console.error("Failed to refresh token"))
+       .catch(() => console.error("Failed to refresh token"))
     }, 60000)
   })
   .catch(() => {
