@@ -1,6 +1,11 @@
 <template>
   <div class="garden-container">
-    <div v-for="(buis, buisIndex) in moestuinLayout" :key="buisIndex" class="moestuinbuis">
+    <div 
+      v-for="(buis, buisIndex) in moestuinLayout" 
+      :key="buisIndex" 
+      class="moestuinbuis"
+      :class="{ 'buis-dropdown-open': buisHeeftDropdownOpen(buis) }"
+    >
       <div v-for="(slot, slotIndex) in buis.slots" :key="slotIndex" class="slot-wrapper">
         <button @click="toggleDropdown(buisIndex, slotIndex)" class="plant-slot-button">
           {{ slot.plant ? slot.plant : '+' }}
@@ -47,12 +52,12 @@ export default {
         'Komkommer', 'Paprika', 'Aubergine', 'Courgette', 
         'Appel', 'Radijs', 'Framboos', 'Ui', 'Knoflook', 
         'Bramen', 'Basilicum'
-     ],
+      ],
       moestuinLayout: [
         createBuis(),
         createBuis(),
-         createBuis(),
-     ]
+        createBuis(),
+      ]
     };
   },
   computed: {
@@ -68,38 +73,40 @@ export default {
     }
   },
   methods: {
+    // NIEUWE METHODE: Controleert of een buis een open dropdown heeft
+    buisHeeftDropdownOpen(buis) {
+      return buis.slots.some(slot => slot.showDropdown);
+    },
+
     // Schakelt de dropdown in of uit voor een specifiek slot
     toggleDropdown(buisIndex, slotIndex) {
-      // Zorg ervoor dat alle andere dropdowns gesloten zijn
       this.closeAllDropdowns();
       
-      // Toggle de status van de geklikte dropdown
       this.moestuinLayout[buisIndex].slots[slotIndex].showDropdown = 
         !this.moestuinLayout[buisIndex].slots[slotIndex].showDropdown;
 
-      // Reset de zoekterm wanneer een dropdown opent
       if (this.moestuinLayout[buisIndex].slots[slotIndex].showDropdown) {
           this.searchQuery = '';
       }
     },
 
-    // Sluit alle dropdowns
+    // Sluit alle dropdowns (FIXED: geen this.$set meer nodig)
     closeAllDropdowns() {
-  this.moestuinLayout.forEach(buis => {
-    buis.slots.forEach(slot => {
-      // Verwijder this.$set en wijzig de eigenschap direct
-      slot.showDropdown = false; 
-    });
-  });
-},
+      this.moestuinLayout.forEach(buis => {
+        buis.slots.forEach(slot => {
+          slot.showDropdown = false; 
+        });
+      });
+    },
 
     // Slaat de gekozen plant op en sluit de dropdown
     selectPlant(buisIndex, slotIndex, plantNaam) {
-      // Gebruik Vue.set om Vue te vertellen dat we de 'plant' eigenschap updaten
-      this.$set(this.moestuinLayout[buisIndex].slots[slotIndex], 'plant', plantNaam);
-      // Sluit de dropdown
-      this.moestuinLayout[buisIndex].slots[slotIndex].showDropdown = false;
-    }
+  // GEFIXTE REGEL: Direct de eigenschap van het slot wijzigen (Vue 3 stijl)
+  this.moestuinLayout[buisIndex].slots[slotIndex].plant = plantNaam;
+  
+  // Sluit de dropdown
+  this.moestuinLayout[buisIndex].slots[slotIndex].showDropdown = false;
+}
   }
 };
 </script>
@@ -107,14 +114,14 @@ export default {
 <style>
 /* Algemene container voor centrering */
 .garden-container {
-    max-width: 1100;
+    max-width: 1100px;
     margin: 0 auto;
     padding: 20px;
 }
 
 /* Stijl voor de moestuinbuizen */
 .moestuinbuis {
-  background-color: #555; /* Donkergrijs, zoals in je originele code */
+  background-color: #8f8f8f; /* Donkergrijs, zoals in je originele code */
   width: 100%; 
   height: 100px; /* Vaste hoogte voor de buis */
   margin-top: 30px;
@@ -123,6 +130,11 @@ export default {
   justify-content: space-around; /* Verdeelt de slots gelijkmatig */
   align-items: center; /* Centreert de slots verticaal in de buis */
   position: relative; /* Belangrijk voor het positioneren van de dropdowns */
+  transition: z-index 0s;
+}
+
+.buis-dropdown-open {
+  z-index: 100;
 }
 
 /* Container voor elke knop/slot en zijn dropdown */
@@ -154,18 +166,20 @@ export default {
 
 /* Stijl voor de dropdown box */
 .dropdown-menu {
+    background-color: white;
     position: absolute;
     top: 70px; /* Plaats de dropdown net onder de knop */
     left: 50%;
-    transform: translateX(-50%); /* Centreer de dropdown onder de knop */
+    transform: translateX(-50%); 
     width: 250px;
-    background-color: white;
-    border: 1px solid #ccc;
+    color: #2d6a4f;
+    border: 1px solid #2d6a4f;
     border-radius: 8px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     padding: 10px;
     max-height: 300px;
     overflow-y: auto;
+    cursor: pointer;
 }
 
 /* Stijl voor het zoekveld */
