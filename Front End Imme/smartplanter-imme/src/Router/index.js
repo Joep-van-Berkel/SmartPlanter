@@ -5,10 +5,10 @@ import Data from '../pages/Data.vue'
 import Notificaties from '../pages/Notificaties.vue'
 
 const routes = [
-    {path: '/home', component: Home, meta: { requiresAuth: true }},
-    {path: '/account', component: Account},
-    {path: '/data',  component: Data},
-    {path: '/notificaties', component: Notificaties}
+  { path: '/home', component: Home, meta: { requiresAuth: true }},
+  { path: '/account', component: Account },
+  { path: '/data', component: Data },
+  { path: '/notificaties', component: Notificaties }
 ]
 
 const router = createRouter({
@@ -17,15 +17,18 @@ const router = createRouter({
 })
 
 router.beforeEach((to, from, next) => {
-  const app = router.app
-  if (!app) return next()   // Router is nog niet klaar
+  const keycloak = router.app.config.globalProperties.$keycloak
 
-  const keycloak = app.config.globalProperties.$keycloak
+  // Router is nog niet klaar → ga verder
+  if (!keycloak) return next()
 
   if (to.meta.requiresAuth && !keycloak.authenticated) {
-    return keycloak.login({ redirectUri: window.location.origin + to.path })
+    return keycloak.login({
+      redirectUri: window.location.origin + to.fullPath
+    })
   }
 
   next()
 })
+
 export default router
