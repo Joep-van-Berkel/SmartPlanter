@@ -1,6 +1,8 @@
 <template>
 <div class="linechart">
     <canvas ref="canvasEl"></canvas>
+      <p class="datawaarde-uitleg">pH waarde:</p>
+      <p class="data-betekenis">Deze pH waarde is:...</p>
 </div>
 </template>
 
@@ -50,9 +52,19 @@ new Chart(canvasEl.value, {
     background-color:  #2d6a4f28;
     border-radius: 15%;
     width: 22rem;
-    height: 15rem;
+    height: 15rem; 
+}
 
-     
+.datawaarde-uitleg{
+  margin-top: 0.5rem;
+  font-size: 0.9rem;
+  color: #333;
+}
+
+.data-betekenis{
+  margin-top: 1rem;
+  font-size: 0.9rem;
+  color: #333;
 }
 
 </style>
