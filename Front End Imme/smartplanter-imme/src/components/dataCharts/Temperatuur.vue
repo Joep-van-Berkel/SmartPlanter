@@ -1,6 +1,8 @@
 <template>
 <div class="linechart">
     <canvas ref="canvasEl"></canvas>
+    <p class="datawaarde-uitleg">Watertemperatuur waarde:</p>
+    <p1 class="data-betekenis">Deze temperatuur is goed</p1>
 </div>
 </template>
 
@@ -51,9 +53,20 @@ new Chart(canvasEl.value, {
     border-radius: 15%;
     width: 22rem;
     height: 15rem;
+}
 
+.datawaarde-uitleg{
+  text-align: center;
+  margin-top: 0.5rem;
+  font-size: 0.9rem;
+  color: #333;
+}
 
-
+.data-betekenis{
+  text-align: center;
+  margin-top: 1rem;
+  font-size: 0.9rem;
+  color: #333;
 }
 
 </style>

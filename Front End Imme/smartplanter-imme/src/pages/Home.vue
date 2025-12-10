@@ -1,36 +1,16 @@
 <template>
   <section>
     <h1>We zouden nu in de moestuin pagina mogen zitten</h1>
-    <button class="api-test" @click="testAPI">Test van API</button>
   </section>
+  <div class="moestuinbuis"></div>
+  <div class="moestuinbuis2"></div>
+  <div class="moestuinbuis3"></div>
 </template>
 
 <script>
 export default {
   name: 'HomePagina',
 
-  methods: {
-    async testAPI() {
-      try {
-        const response = await fetch('https://158.101.223.137:1880/mongotest?device_id=devide1', {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json'
-          }
-        });
-
-        if (!response.ok) {
-          throw new Error('Netwerkfout: ' + response.status);
-        }
-
-        const data = await response.json();
-        console.log('Opgehaalde data:', data);
-
-      } catch (error) {
-        console.error('Fout bij ophalen data:', error);
-      }
-    }
-  }
 }
 </script>
 
@@ -39,9 +19,28 @@ h1 {
   color: rgb(0, 0, 0);
 }
 
-.api-test {
-  color: white;
-  background-color: blue;
-  border-radius: 5%;
+.moestuinbuis {
+  background-color:black;
+  width: 80px;
+  height: 20px;
+  margin-left: 10px;
+  margin-top: 30px;
 }
+
+.moestuinbuis {
+  background-color:black;
+  width: 80px;
+  height: 20px;
+  margin-left: 10px;
+  margin-top: 60px;
+}
+
+.moestuinbuis {
+  background-color:black;
+  width: 80px;
+  height: 20px;
+  margin-left: 10px;
+  margin-top: 100px;
+}
+
 </style>
