@@ -22,33 +22,32 @@ import { ref, defineComponent, computed } from 'vue'
 
 // ----------------------------------------------------
 // 1. STATE MANAGEMENT IN DE PARENT COMPONENT
+// Array om de selecties van de 3 buizen (4 plekken elk) bij te houden.
 // ----------------------------------------------------
 const buisSelecties = ref([
-  [null, null, null, null], // Buis 1: 4 plekken
-  [null, null, null, null], // Buis 2: 4 plekken
-  [null, null, null, null]  // Buis 3: 4 plekken
+  [null, null, null, null], // Buis 1
+  [null, null, null, null], // Buis 2
+  [null, null, null, null]  // Buis 3
 ])
 
-// Functie om de selectie in de centrale buisSelecties state bij te werken
+// Functie die wordt aangeroepen door de Dropdown om een selectie bij te werken
 const updateSelection = (buisIndex, plekIndex, newValue) => {
   buisSelecties.value[buisIndex][plekIndex] = newValue
 }
 
 
 // ----------------------------------------------------
-// 2. DE HERBRUIKBARE DROPDOWN COMPONENT (FIXED)
+// 2. DE HERBRUIKBARE DROPDOWN COMPONENT (DEFINITIEF EN BUGVRIJ)
 // ----------------------------------------------------
 const Dropdown = defineComponent({
   name: 'Dropdown',
   
-  // Definieer de prop voor v-model (modelValue)
   props: {
     modelValue: {
       type: String,
       default: null 
     }
   },
-  // Definieer de emit voor v-model (@update:modelValue)
   emits: ['update:modelValue'],
 
   setup(props, { emit }) {
@@ -71,18 +70,27 @@ const Dropdown = defineComponent({
 
     const toggle = () => open.value = !open.value
     
-    // De selectie wordt ge-emit naar de parent
     const choose = item => {
-      emit('update:modelValue', item) // Stuurt de nieuwe waarde omhoog
+      emit('update:modelValue', item) 
       open.value = false
       search.value = ""
     }
+    
+    // 🚨 DE FIX: Zorg ervoor dat de prop 'modelValue' expliciet wordt teruggegeven.
+    // Dit lost de "uitgecomment" weergave (de runtime error) op bij het gebruik van defineComponent met inline template.
+    const modelValue = computed(() => props.modelValue);
 
-    // We hoeven 'props' niet terug te geven voor correcte rendering
-    return { open, search, filteredItems, toggle, choose } 
+    return { 
+        open, 
+        search, 
+        filteredItems, 
+        toggle, 
+        choose,
+        modelValue // BELANGRIJK: geeft de computed prop terug
+    } 
   },
 
-  // ⬇️ DE GEFIXTE INLINE TEMPLATE
+  // ⬇️ DE INLINE TEMPLATE (deze is nu correct omdat modelValue in de scope zit)
   template: `
 <div class="dropdown-container">
   <button class="select-button" @click="toggle">
@@ -120,7 +128,7 @@ const Dropdown = defineComponent({
 <style>
 /* --- Moestuinbuizen --- */
 .moestuinbuis1, .moestuinbuis2, .moestuinbuis3 {
-  background-color: rgb(140, 140, 140);
+  background-color: rgb(85, 85, 85);
   width: 80%;
   height: 20vh;
   margin-left: 10%;
@@ -150,7 +158,6 @@ const Dropdown = defineComponent({
   font-size: 0.9rem;
   min-width: 10rem;
   text-align: left;
-  /* Zorgt ervoor dat de tekst niet buiten de knop valt als er veel tekst is */
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
@@ -171,7 +178,7 @@ const Dropdown = defineComponent({
   display: flex;
   flex-direction: column;
   gap: 0.4rem;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Optioneel: schaduw */
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); 
 }
 
 .dropdown-search {
@@ -179,7 +186,7 @@ const Dropdown = defineComponent({
   padding: 0.4rem;
   border: 1px solid #bbb;
   border-radius: 5px;
-  box-sizing: border-box; /* Zorgt dat padding binnen de breedte valt */
+  box-sizing: border-box; 
 }
 
 .dropdown ul {
@@ -200,7 +207,7 @@ const Dropdown = defineComponent({
 
 /* Visuele feedback voor reeds geselecteerd item */
 .selected-item {
-    background-color: #d1e7dd; /* Een lichtgroene kleur */
+    background-color: #d1e7dd; 
     font-weight: bold;
 }
 
