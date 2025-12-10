@@ -1,17 +1,15 @@
 <script setup>
 import { ref } from 'vue'
-import { useRouter } from 'vue-router'
+import keycloak from '../main'   // <-- BELANGRIJK: keycloak importeren
 
-// Reactieve placeholders
 const username = ref('Gebruiker Naam')
 const email = ref('email@voorbeeld.com')
 const userFirstLetter = ref('G')
 
-const router = useRouter()
-
 function logout() {
-  // Simpele frontend logout: navigeer naar login
-  router.push('/')
+  keycloak.logout({
+    redirectUri: window.location.origin
+  })
 }
 </script>
 
