@@ -1,35 +1,52 @@
-import { createApp } from 'vue';
-import App from './App.vue';
+// main.js
+import { createApp } from 'vue'
+import App from './App.vue'
 import Keycloak from 'keycloak-js'
+import router, { setKeycloak } from './router'
 
-// --- STAP 1: Keycloak Configuratie ---
+// --- KEYCLOAK CONFIG ---
 const initOptions = {
-  // 💡 BELANGRIJK: Gebruik HIER uw externe HTTPS URL
-     url: 'https://141.148.237.73:8443', // ⬅️ PAS DIT AAN
-     realm: 'smartplanter',
-     clientId: 'frontend-jesse',
-};
+  url: 'https://141.148.237.73:8443',
+  realm: 'smartplanter',
+  clientId: 'frontend-jesse',
+}
 
-const keycloak = new Keycloak(initOptions);
+const keycloak = new Keycloak(initOptions)
 
-// --- STAP 2: Initialisatie en App Opstarten ---
-keycloak
-  .init({
-    onLoad: 'login-required', // Dwingt de gebruiker om in te loggen bij het opstarten
-    pkceMethod: 'S256', // Aanbevolen beveiligingsmethode
-  })
-  .then((authenticated) => {
-    if (authenticated) {
-      console.log('Gebruiker is succesvol geauthenticeerd');
+// Keycloak doorgeven aan router guards
+setKeycloak(keycloak)
 
-      // Maak de Keycloak-instantie globaal beschikbaar in de Vue-app
-      const app = createApp(App);
-      app.config.globalProperties.$keycloak = keycloak;
-      app.mount('#app');
-    } else {
-      console.log('Authenticatie mislukt of gebruiker is uitgelogd');
+// --- INITIALISEER KEYCLOAK ---
+keycloak.init({
+  onLoad: 'login-required',
+  pkceMethod: 'S256'
+})
+  .then((auth) => {
+    if (!auth) {
+      console.warn("⚠️ Keycloak authentication failed or canceled.")
+      return
     }
+
+    console.log("Authenticated")
+
+    const app = createApp(App)
+
+    // Keycloak beschikbaar in hele app
+    app.config.globalProperties.$keycloak = keycloak
+
+    app.use(router)
+    app.mount('#app')
+
+    // TOKEN AUTO-REFRESH
+    setInterval(() => {
+      keycloak.updateToken(70)
+        .then((refreshed) => {
+          if (refreshed) console.log('🔄 Token refreshed')
+        })
+        .catch(() => console.error('❌ Failed to refresh token'))
+    }, 60000)
   })
-  .catch((e) => {
-    console.error('Fout bij het initialiseren van Keycloak:', e);
-  });
+  .catch((error) => {
+    console.error("Authentication Failed")
+    console.error(error)
+  })
