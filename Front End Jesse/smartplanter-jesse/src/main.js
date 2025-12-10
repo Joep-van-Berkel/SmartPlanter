@@ -53,6 +53,6 @@ keycloak.init({
     }, 60000)
   })
   .catch((error) => {
-    console.error("Authentication Failed")
+    console.error("❌ Authentication Failed")
     console.error(error)
   })
