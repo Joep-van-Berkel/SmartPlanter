@@ -6,7 +6,7 @@ import router, { setKeycloak } from './router'
 
 // --- KEYCLOAK CONFIG ---
 const initOptions = {
-  url: 'https://141.148.237.73:8443/',
+  url: 'https://141.148.237.73:8443',
   realm: 'smartplanter',
   clientId: 'frontend-jesse',
 }
