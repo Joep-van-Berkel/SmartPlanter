@@ -1,60 +1,30 @@
+// main.js
 import { createApp } from 'vue'
 import App from './App.vue'
 import Keycloak from 'keycloak-js'
-import { createRouter, createWebHistory } from 'vue-router'
-
-import DashboardPage from './pages/DashboardPage.vue'
-import SettingsPage from './pages/SettingsPage.vue'
+import router, { setKeycloak } from './router'
 
 // --- KEYCLOAK CONFIG ---
 const initOptions = {
   url: 'https://141.148.237.73:8443/',
   realm: 'smartplanter',
-  clientId: 'frontend-imme',
+  clientId: 'frontend-jesse',
   onLoad: 'login-required'
 }
 
 const keycloak = new Keycloak(initOptions)
 
-// --- ROUTER CONFIGURATIE ---
-const routes = [
-  { path: '/', component: DashboardPage },
-  { 
-    path: '/admin',
-    component: SettingsPage,
-    meta: { requiresRole: 'admin' }
-  }
-]
-
-const router = createRouter({
-  history: createWebHistory(),
-  routes
-})
-
-// --- NAVIGATION GUARD ---
-router.beforeEach((to, from, next) => {
-  if (to.meta.requiresRole) {
-    const hasRole = keycloak.hasRealmRole(to.meta.requiresRole)
-
-    if (hasRole) next()
-    else {
-      alert('⛔ Geen toegang! Je hebt geen admin rechten.')
-      next('/')
-    }
-  } else {
-    next()
-  }
-})
+// Keycloak doorgeven aan router guards
+setKeycloak(keycloak)
 
 // --- INITIALISEER KEYCLOAK ---
-keycloak.init({ 
+keycloak.init({
   onLoad: initOptions.onLoad,
-  pkceMethod: 'S256' // Voor public clients
+  pkceMethod: 'S256'
 })
   .then((auth) => {
     if (!auth) {
-      console.warn("⚠️ Keycloak authentication failed or was canceled. Check client settings in Keycloak.")
-      console.log("Auth object:", auth)
+      console.warn("⚠️ Keycloak authentication failed or canceled.")
       return
     }
 
@@ -68,7 +38,7 @@ keycloak.init({
     app.use(router)
     app.mount('#app')
 
-    // Token auto-refresh
+    // TOKEN AUTO-REFRESH
     setInterval(() => {
       keycloak.updateToken(70)
         .then((refreshed) => {
@@ -78,6 +48,6 @@ keycloak.init({
     }, 60000)
   })
   .catch((error) => {
-    console.error("Authentication Failed");
-    console.error(error);
+    console.error("Authentication Failed")
+    console.error(error)
   })
