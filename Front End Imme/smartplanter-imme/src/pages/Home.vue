@@ -1,219 +1,196 @@
 <template>
-  <div>
-    <div 
-      v-for="(buis, buisIndex) in buisSelecties" 
-      :key="buisIndex" 
-      :class="'moestuinbuis' + (buisIndex + 1)"
-    >
-      <div class="button-row">
-        <Dropdown 
-          v-for="i in 4" 
-          :key="i"
-          :modelValue="buis[i - 1]"
-          @update:modelValue="updateSelection(buisIndex, i - 1, $event)"
-        />
+  <div class="garden-container">
+    <div v-for="(buis, buisIndex) in moestuinLayout" :key="buisIndex" class="moestuinbuis">
+      <div v-for="(slot, slotIndex) in buis.slots" :key="slotIndex" class="slot-wrapper">
+        <button @click="toggleDropdown(buisIndex, slotIndex)" class="plant-slot-button">
+          {{ slot.plant ? slot.plant : '+' }}
+        </button>
+
+        <div v-if="slot.showDropdown" class="dropdown-menu">
+          <input 
+            type="text" 
+            v-model="searchQuery" 
+            placeholder="Zoek groente/fruit..." 
+            class="search-input"
+          />
+          <div class="plant-list">
+            <div 
+              v-for="plant in filteredPlants" 
+              :key="plant" 
+              @click="selectPlant(buisIndex, slotIndex, plant)"
+              class="plant-item"
+            >
+              {{ plant }}
+            </div>
+            <div v-if="filteredPlants.length === 0" class="no-results">
+                Geen resultaten gevonden.
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
 </template>
 
-<script setup>
-import { ref, defineComponent, computed } from 'vue'
-
-// ----------------------------------------------------
-// 1. STATE MANAGEMENT IN DE PARENT COMPONENT
-// Array om de selecties van de 3 buizen (4 plekken elk) bij te houden.
-// ----------------------------------------------------
-const buisSelecties = ref([
-  [null, null, null, null], // Buis 1
-  [null, null, null, null], // Buis 2
-  [null, null, null, null]  // Buis 3
-])
-
-// Functie die wordt aangeroepen door de Dropdown om een selectie bij te werken
-const updateSelection = (buisIndex, plekIndex, newValue) => {
-  buisSelecties.value[buisIndex][plekIndex] = newValue
-}
-
-
-// ----------------------------------------------------
-// 2. DE HERBRUIKBARE DROPDOWN COMPONENT (DEFINITIEF EN BUGVRIJ)
-// ----------------------------------------------------
-const Dropdown = defineComponent({
-  name: 'Dropdown',
-  
-  props: {
-    modelValue: {
-      type: String,
-      default: null 
+<script>
+export default {
+  name: 'HomePagina',
+  data() {
+    return {
+      searchQuery: '',
+      // Lijst met alle mogelijke groenten/fruit
+      allePlanten: [
+        'Tomaat', 'Wortel', 'Broccoli', 'Sla', 'Aardbei', 
+        'Komkommer', 'Paprika', 'Aubergine', 'Courgette', 
+        'Pompoen', 'Radijs', 'Spinazie', 'Ui', 'Knoflook', 
+        'Bieslook', 'Peterselie'
+      ],
+      // De structuur die de status van de moestuin bijhoudt
+      moestuinLayout: [
+        { slots: Array(4).fill({ plant: null, showDropdown: false }) },
+        { slots: Array(4).fill({ plant: null, showDropdown: false }) },
+        { slots: Array(4).fill({ plant: null, showDropdown: false }) },
+      ]
+    };
+  },
+  computed: {
+    // Berekent welke planten getoond moeten worden op basis van de zoekterm
+    filteredPlants() {
+      if (!this.searchQuery) {
+        return this.allePlanten;
+      }
+      const searchLower = this.searchQuery.toLowerCase();
+      return this.allePlanten.filter(plant => 
+        plant.toLowerCase().includes(searchLower)
+      );
     }
   },
-  emits: ['update:modelValue'],
+  methods: {
+    // Schakelt de dropdown in of uit voor een specifiek slot
+    toggleDropdown(buisIndex, slotIndex) {
+      // Zorg ervoor dat alle andere dropdowns gesloten zijn
+      this.closeAllDropdowns();
+      
+      // Toggle de status van de geklikte dropdown
+      this.moestuinLayout[buisIndex].slots[slotIndex].showDropdown = 
+        !this.moestuinLayout[buisIndex].slots[slotIndex].showDropdown;
 
-  setup(props, { emit }) {
-    const open = ref(false)
-    const search = ref("")
+      // Reset de zoekterm wanneer een dropdown opent
+      if (this.moestuinLayout[buisIndex].slots[slotIndex].showDropdown) {
+          this.searchQuery = '';
+      }
+    },
 
-    const items = [
-      'Komkommer', 'Courgette', 'Aardbeien', 'Wortels',
-      'Tomaat', 'Paprika', 'Sla', 'Boontjes',
-      'Ui', 'Knoflook', 'Spinazie', 'Radijs',
-      'Aubergine', 'Prei', 'Spruiten', 'Bieten',
-      'Bosbes', 'Framboos', 'Peterselie', 'Munt'
-    ]
+    // Sluit alle dropdowns
+    closeAllDropdowns() {
+      this.moestuinLayout.forEach(buis => {
+        buis.slots.forEach(slot => {
+          // Gebruik Vue.set om ervoor te zorgen dat Vue de verandering detecteert
+          this.$set(slot, 'showDropdown', false);
+        });
+      });
+    },
 
-    const filteredItems = computed(() =>
-      items.filter(item =>
-        item.toLowerCase().includes(search.value.toLowerCase())
-      )
-    )
-
-    const toggle = () => open.value = !open.value
-    
-    const choose = item => {
-      emit('update:modelValue', item) 
-      open.value = false
-      search.value = ""
+    // Slaat de gekozen plant op en sluit de dropdown
+    selectPlant(buisIndex, slotIndex, plantNaam) {
+      // Gebruik Vue.set om Vue te vertellen dat we de 'plant' eigenschap updaten
+      this.$set(this.moestuinLayout[buisIndex].slots[slotIndex], 'plant', plantNaam);
+      // Sluit de dropdown
+      this.moestuinLayout[buisIndex].slots[slotIndex].showDropdown = false;
     }
-    
-    // 🚨 DE FIX: Zorg ervoor dat de prop 'modelValue' expliciet wordt teruggegeven.
-    // Dit lost de "uitgecomment" weergave (de runtime error) op bij het gebruik van defineComponent met inline template.
-    const modelValue = computed(() => props.modelValue);
-
-    return { 
-        open, 
-        search, 
-        filteredItems, 
-        toggle, 
-        choose,
-        modelValue // BELANGRIJK: geeft de computed prop terug
-    } 
-  },
-
-  // ⬇️ DE INLINE TEMPLATE (deze is nu correct omdat modelValue in de scope zit)
-  template: `
-<div class="dropdown-container">
-  <button class="select-button" @click="toggle">
-    {{ modelValue || 'Selecteer groente' }}
-  </button>
-
-  <div v-if="open" class="dropdown">
-    <input
-      class="dropdown-search"
-      type="text"
-      v-model="search"
-      placeholder="Zoek..."
-    />
-
-    <ul>
-      <li
-        v-for="item in filteredItems"
-        :key="item"
-        @click="choose(item)"
-        :class="{ 'selected-item': item === modelValue }"
-      >
-        {{ item }}
-      </li>
-
-      <li v-if="filteredItems.length === 0" class="empty">
-        Geen resultaten
-      </li>
-    </ul>
-  </div>
-</div>
-`
-})
+  }
+};
 </script>
 
 <style>
-/* --- Moestuinbuizen --- */
-.moestuinbuis1, .moestuinbuis2, .moestuinbuis3 {
-  background-color: rgb(85, 85, 85);
-  width: 80%;
-  height: 20vh;
-  margin-left: 10%;
+/* Algemene container voor centrering */
+.garden-container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+/* Stijl voor de moestuinbuizen */
+.moestuinbuis {
+  background-color: #555; /* Donkergrijs, zoals in je originele code */
+  width: 100%; 
+  height: 100px; /* Vaste hoogte voor de buis */
+  margin-top: 30px;
   border-radius: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-top: 5vh;
+  display: flex; /* Zorgt ervoor dat de slots naast elkaar staan */
+  justify-content: space-around; /* Verdeelt de slots gelijkmatig */
+  align-items: center; /* Centreert de slots verticaal in de buis */
+  position: relative; /* Belangrijk voor het positioneren van de dropdowns */
 }
 
-.button-row {
-  display: flex;
-  gap: 1rem;
+/* Container voor elke knop/slot en zijn dropdown */
+.slot-wrapper {
+    position: relative;
+    z-index: 10; /* Zorgt ervoor dat de dropdown over de andere buizen valt */
 }
 
-/* --- Dropdown Styling --- */
-.dropdown-container {
-  position: relative;
-}
-
-.select-button {
-  background-color: white;
-  border: none;
-  padding: 0.5rem 1rem;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 0.9rem;
-  min-width: 10rem;
-  text-align: left;
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-}
-
-.dropdown {
-  position: absolute;
-  top: 2.8rem;
-  left: 0;
-  background-color: white;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-  width: 100%;
-  max-height: 15rem;
-  overflow-y: auto;
-  padding: 0.5rem;
-  z-index: 20;
-  display: flex;
-  flex-direction: column;
-  gap: 0.4rem;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); 
-}
-
-.dropdown-search {
-  width: 100%;
-  padding: 0.4rem;
-  border: 1px solid #bbb;
-  border-radius: 5px;
-  box-sizing: border-box; 
-}
-
-.dropdown ul {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-.dropdown li {
-  padding: 0.4rem;
-  cursor: pointer;
-  border-radius: 4px;
-}
-
-.dropdown li:hover {
-  background-color: #eee;
-}
-
-/* Visuele feedback voor reeds geselecteerd item */
-.selected-item {
-    background-color: #d1e7dd; 
+/* De knop die het slot voorstelt */
+.plant-slot-button {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%; /* Maak het rond */
+    background-color: #90ee90; /* Lichtgroen voor een plant-slot */
+    border: 3px solid #3c803c;
+    color: #333;
+    font-size: 1.2rem;
     font-weight: bold;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: background-color 0.2s;
 }
 
-.empty {
-  color: #999;
-  font-style: italic;
-  cursor: default;
+.plant-slot-button:hover {
+    background-color: #a7f7a7;
+}
+
+/* Stijl voor de dropdown box */
+.dropdown-menu {
+    position: absolute;
+    top: 70px; /* Plaats de dropdown net onder de knop */
+    left: 50%;
+    transform: translateX(-50%); /* Centreer de dropdown onder de knop */
+    width: 250px;
+    background-color: white;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    padding: 10px;
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+/* Stijl voor het zoekveld */
+.search-input {
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 10px;
+    box-sizing: border-box;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+/* Stijl voor de individuele plant items in de lijst */
+.plant-item {
+    padding: 8px 10px;
+    cursor: pointer;
+    border-radius: 4px;
+}
+
+.plant-item:hover {
+    background-color: #f0f0f0;
+    color: #3c803c;
+}
+
+.no-results {
+    color: #999;
+    padding: 10px;
+    text-align: center;
 }
 </style>
