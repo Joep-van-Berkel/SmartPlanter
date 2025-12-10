@@ -1,44 +1,29 @@
 <template>
-  <div id="app">
-    <router-view />
-  </div>
+  
+  <router-view />
+  
 </template>
 
 <script>
+
+
+
+
+
 export default {
   name: 'App',
-  data() {
-    return {
-      username: '',
-      token: ''
-    }
-  },
-  mounted() {
-    // Haal de instantie op die we in main.js hebben ingesteld
-    const keycloak = this.$keycloak;
-    
-    if (keycloak && keycloak.authenticated) {
-      // Probeer username uit diverse velden te halen
-      this.username = keycloak.tokenParsed.preferred_username || keycloak.tokenParsed.name || 'Gebruiker';
-      this.token = keycloak.token;
-    }
-  },
-  methods: {
-    logout() {
-      this.$keycloak.logout();
-    }
+  components: {
   }
 }
 </script>
 
 <style>
+
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');
 
 body {
   font-family: "Poppins", sans-serif;
   background: var(--bg);
-  margin: 0;
-  padding: 0;
 }
 
 * {
@@ -48,20 +33,29 @@ body {
 }
 
 ::selection {
-  background-color: var(--primary);
-  color: var(--primary-dark);
+  background-color: var(--primary); /* achtergrondkleur van selectie */
+  color: var(--primary-dark); /* tekstkleur tijdens selectie */
 }
 
+/* width */
 ::-webkit-scrollbar {
   width: 10px;
 }
+
+/* Track */
 ::-webkit-scrollbar-track {
   background: var(--primary-dark);
 }
+
+/* Handle */
 ::-webkit-scrollbar-thumb {
   background: var(--primary);
 }
+
+/* Handle on hover */
 ::-webkit-scrollbar-thumb:hover {
   background: var(--primary);
 }
+
+
 </style>
