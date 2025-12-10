@@ -1,9 +1,4 @@
 <script setup>
-import { ref } from 'vue'
-
-const username = ref('Gebruiker Naam')
-const email = ref('email@voorbeeld.com')
-const userFirstLetter = ref('G')
 
 </script>
 
@@ -51,7 +46,7 @@ const userFirstLetter = ref('G')
         </li>
 
         <li>
-          <button class="nav-item" @click="logout">
+          <button class="nav-item" @click="$auth.logout()">
             <i class="fa-solid fa-right-from-bracket"></i>
             <span class="label">Loguit</span>
           </button>
@@ -62,11 +57,11 @@ const userFirstLetter = ref('G')
     <!-- PROFIEL -->
     <div class="profile">
       <div class="profilePicture">
-        <span>{{ userFirstLetter }}</span>
+        <span>{{ $auth.user.firstLetter}}</span>
       </div>
       <div class="profileInfo">
-        <span class="username">{{ username }}</span>
-        <span class="usermail">{{ email }}</span>
+        <span class="username">{{ $auth.user.fullName }}</span>
+        <span class="usermail">{{ $auth.user.email }}</span>
       </div>
     </div>
 

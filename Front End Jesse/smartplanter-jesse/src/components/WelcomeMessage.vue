@@ -1,14 +1,11 @@
 <script setup>
-import { ref } from 'vue'
 
-// Placeholder naam, kan later dynamisch worden aangepast
-const fullName = ref('Gebruiker Naam')
 </script>
 
 <template>
   <div class="welcomeMessage">
     <h1>Hallo,</h1>
-    <span>{{ fullName }}</span>
+    <span>{{ $auth.user.fullName }}</span>
   </div>
 </template>
 
