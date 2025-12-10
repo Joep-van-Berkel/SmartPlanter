@@ -1,6 +1,6 @@
 import { createApp } from 'vue';
 import App from './App.vue';
-import Keycloak from 'keycloak-js';
+import Keycloak from 'keycloak-js'
 
 // --- STAP 1: Keycloak Configuratie ---
 const initOptions = {

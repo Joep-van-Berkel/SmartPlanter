@@ -10,8 +10,7 @@
   "dependencies": {
     "chart.js": "^4.5.1",
     "core-js": "^3.8.3",
-    "keycloak": "^1.2.0",
-    "keycloak-js": "^20.0.5",
+    "keycloak-js": "^26.2.1",
     "lucide-vue-next": "^0.553.0",
     "vue": "^3.2.13",
     "vue-chartjs": "^5.3.3",
@@ -20,6 +19,7 @@
   "devDependencies": {
     "@babel/core": "^7.12.16",
     "@babel/eslint-parser": "^7.12.16",
+    "@babel/plugin-transform-private-methods": "^7.27.1",
     "@vue/cli-plugin-babel": "~5.0.0",
     "@vue/cli-plugin-eslint": "~5.0.0",
     "@vue/cli-service": "~5.0.0",
