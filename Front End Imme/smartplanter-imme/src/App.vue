@@ -1,9 +1,12 @@
 <template>
+  <div id="layout">
     <NavBar/>
-  <router-view/>
+    <main class="content">
+      <router-view/>
+    </main>
   <FooterBar @logout="logout"/>
 
-
+    </div>
 </template>
 
 <script>
@@ -51,7 +54,13 @@ export default {
   flex-direction: column;
 }
 
-router-view {
+#layout {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.content {
   flex: 1;
 }
 
