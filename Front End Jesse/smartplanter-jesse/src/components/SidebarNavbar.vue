@@ -1,16 +1,10 @@
 <script setup>
 import { ref } from 'vue'
-import keycloak from '../main'   // <-- BELANGRIJK: keycloak importeren
 
 const username = ref('Gebruiker Naam')
 const email = ref('email@voorbeeld.com')
 const userFirstLetter = ref('G')
 
-function logout() {
-  keycloak.logout({
-    redirectUri: window.location.origin
-  })
-}
 </script>
 
 <template>

@@ -14,33 +14,77 @@ const initOptions = {
 
 const keycloak = new Keycloak(initOptions)
 
-// Keycloak doorgeven aan router guards
+// Doorsturen naar router guards
 setKeycloak(keycloak)
 
+// --- HANDIGE FUNCTIONS TOEVOEGEN ---
+function buildUserObject() {
+  if (!keycloak.tokenParsed) return null
+
+  return {
+    username: keycloak.tokenParsed.preferred_username,
+    email: keycloak.tokenParsed.email,
+    firstName: keycloak.tokenParsed.given_name,
+    lastName: keycloak.tokenParsed.family_name,
+    fullName:
+      (keycloak.tokenParsed.given_name ?? '') +
+      ' ' +
+      (keycloak.tokenParsed.family_name ?? ''),
+    firstLetter:
+      keycloak.tokenParsed.given_name?.charAt(0)?.toUpperCase() ??
+      keycloak.tokenParsed.preferred_username?.charAt(0)?.toUpperCase() ??
+      '?',
+  }
+}
+
+// Globale AUTH helper
+const auth = {
+  keycloak,
+
+  // User info ophalen
+  get user() {
+    return buildUserObject()
+  },
+
+  // Logout functie
+  logout() {
+    keycloak.logout({
+      redirectUri: window.location.origin,
+    })
+  },
+
+  // Token vernieuwen
+  refresh() {
+    return keycloak.updateToken(60)
+  },
+}
+
 // --- INITIALISEER KEYCLOAK ---
-keycloak.init({
-  onLoad: 'login-required',
-  pkceMethod: 'S256'
-})
-  .then((auth) => {
-    if (!auth) {
-      console.warn("⚠️ Keycloak authentication failed or canceled.")
+keycloak
+  .init({
+    onLoad: 'login-required',
+    pkceMethod: 'S256',
+  })
+  .then((authSuccess) => {
+    if (!authSuccess) {
+      console.warn('⚠️ Keycloak authentication failed or canceled.')
       return
     }
 
-    console.log("Authenticated")
+    console.log('Authenticated')
 
     const app = createApp(App)
 
-    // Keycloak beschikbaar in hele app
-    app.config.globalProperties.$keycloak = keycloak
+    // Globale AUTH object beschikbaar in hele app
+    app.config.globalProperties.$auth = auth
 
     app.use(router)
     app.mount('#app')
 
     // TOKEN AUTO-REFRESH
     setInterval(() => {
-      keycloak.updateToken(70)
+      keycloak
+        .updateToken(70)
         .then((refreshed) => {
           if (refreshed) console.log('🔄 Token refreshed')
         })
@@ -48,6 +92,6 @@ keycloak.init({
     }, 60000)
   })
   .catch((error) => {
-    console.error("Authentication Failed")
+    console.error('❌ Authentication Failed')
     console.error(error)
   })
