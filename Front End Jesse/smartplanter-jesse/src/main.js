@@ -49,7 +49,7 @@ router.beforeEach((to, from, next) => {
 // --- INITIALISEER KEYCLOAK ---
 keycloak.init({ 
   onLoad: initOptions.onLoad,
-  pkceMethod: 'S256' // Voor public clients
+  //pkceMethod: 'S256' // Voor public clients
 })
   .then((auth) => {
     if (!auth) {
